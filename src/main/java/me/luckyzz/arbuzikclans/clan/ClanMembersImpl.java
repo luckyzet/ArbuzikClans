@@ -1,5 +1,6 @@
 package me.luckyzz.arbuzikclans.clan;
 
+import me.luckkyyz.luckapi.database.QueryExecutors;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -9,16 +10,19 @@ import java.util.Map;
 
 class ClanMembersImpl implements ClanMembers {
 
+    private final QueryExecutors executors;
+
     private final ClanImpl clan;
     private final Map<String, ClanMember> members;
 
-    ClanMembersImpl(ClanImpl clan, Map<String, ClanMember> members) {
+    ClanMembersImpl(QueryExecutors executors, ClanImpl clan, Map<String, ClanMember> members) {
+        this.executors = executors;
         this.clan = clan;
         this.members = members;
     }
 
-    ClanMembersImpl(ClanImpl clan) {
-        this(clan, new HashMap<>());
+    ClanMembersImpl(QueryExecutors executors, ClanImpl clan) {
+        this(executors, clan, new HashMap<>());
     }
 
     @Override
@@ -38,11 +42,8 @@ class ClanMembersImpl implements ClanMembers {
 
     @Override
     public void addOwnerMember(Player player) {
-        // Check rank
-
         ClanMember member = new ClanMemberImpl(clan, player);
         members.put(member.getName(), member);
-
-        clan.getClanService().getExecutors().async().update("INSERT INTO clanMembers VALUES (?, ?)", member.getName(), member.getClan().getId());
+        executors.async().update("INSERT INTO clanMembers VALUES (?, ?)", member.getName(), member.getClan().getId());
     }
 }

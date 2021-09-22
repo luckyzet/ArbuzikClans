@@ -14,7 +14,6 @@ import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.config.Settings;
 import me.luckyzz.arbuzikclans.name.BelowNameService;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -59,28 +58,6 @@ public class ClanServiceImpl implements ClanService {
                 ")");
     }
 
-    QueryExecutors getExecutors() {
-        return executors;
-    }
-
-    MessageConfig<Messages> getMessageConfig() {
-        return messageConfig;
-    }
-
-    @Override
-    public CompletableFuture<Clan> getClanName(String name) {
-        return CompletableFuture.supplyAsync(() -> {
-            return null;
-        });
-    }
-
-    @Override
-    public CompletableFuture<Clan> getClanPlayer(String player) {
-        return CompletableFuture.supplyAsync(() -> {
-            return null;
-        });
-    }
-
     private CompletableFuture<Integer> getLastId() {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         executors.async().result("SELECT id FROM clans ORDER BY id DESC LIMIT 1", result -> {
@@ -94,15 +71,15 @@ public class ClanServiceImpl implements ClanService {
     }
 
     @Override
-    public CompletableFuture<Clan> createClan(String name, Player owner) {
-        return CompletableFuture.supplyAsync(() -> {
-            if(!owner.isOnline()) {
-                return null;
+    public void createClan(String name, Player owner) {
+        CompletableFuture.runAsync(() -> {
+            if (!owner.isOnline()) {
+                return;
             }
 
-            if(!config.getBoolean(Settings.CLAN_NAME_COLORS) && name.contains(ColorUtils.ALTERNATIVE_CODE_STRING)) {
+            if (!config.getBoolean(Settings.CLAN_NAME_COLORS) && name.contains(ColorUtils.ALTERNATIVE_CODE_STRING)) {
                 messageConfig.getMessage(Messages.CLAN_CREATE_NOT_COLORS).send(owner);
-                return null;
+                return;
             }
 
             int id;
@@ -112,34 +89,30 @@ public class ClanServiceImpl implements ClanService {
             } catch (InterruptedException | TimeoutException | ExecutionException exception) {
                 exception.printStackTrace();
                 messageConfig.getMessage(Messages.SOMETHING_WENT_WRONG).send(owner);
-                return null;
+                return;
             }
 
             EconomicUser economicUser = economyProvider.getUser(owner);
             int clanCreateMoney = config.getInt(Settings.CLAN_CREATE_MONEY);
-            if(clanCreateMoney > 0) {
-                if(!economicUser.hasBalance(clanCreateMoney)) {
+            if (clanCreateMoney > 0) {
+                if (!economicUser.hasBalance(clanCreateMoney)) {
                     messageConfig.getAdaptiveMessage(Messages.NOT_ENOUGH_MONEY)
                             .placeholder("%balance%", (int) economicUser.getBalance())
                             .placeholder("%need_balance%", clanCreateMoney)
                             .placeholder("%need%", clanCreateMoney - (int) economicUser.getBalance())
                             .send(owner);
-                    return null;
+                    return;
                 }
                 economicUser.changeBalance(-clanCreateMoney);
             }
 
-            Clan clan = new ClanImpl(this, id, DateUtil.getDate(DateZone.MOSCOW), name, owner);
+            Clan clan = new ClanImpl(messageConfig, executors, id, DateUtil.getDate(DateZone.MOSCOW), name, owner);
             cache.put(clan.getName(), clan);
 
             executors.sync().update("INSERT INTO clans VALUES (?, ?, ?)", clan.getId(), clan.getDateCreated(FormatDate.DATE_TIME), clan.getName());
             messageConfig.getAdaptiveMessage(Messages.CLAN_CREATE_SUCCESS)
                     .placeholder("%name%", clan.getName())
                     .send(owner);
-
-            Bukkit.getScheduler().runTask(plugin, () -> belowNameService.setName(owner, clan.getName()));
-
-            return clan;
         });
     }
 

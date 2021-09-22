@@ -1,5 +1,7 @@
 package me.luckyzz.arbuzikclans.clan;
 
+import me.luckkyyz.luckapi.config.MessageConfig;
+import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckkyyz.luckapi.message.Message;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckyzz.arbuzikclans.config.Messages;
@@ -11,7 +13,8 @@ import java.time.LocalDateTime;
 
 class ClanImpl implements Clan {
 
-    private final ClanServiceImpl clanService;
+    private final MessageConfig<Messages> messageConfig;
+    private final QueryExecutors executors;
 
     private final int id;
     private final LocalDateTime dateCreated;
@@ -19,26 +22,24 @@ class ClanImpl implements Clan {
 
     private final ClanMembersImpl members;
 
-    ClanImpl(ClanServiceImpl clanService, int id, LocalDateTime dateCreated, String name, ClanMembersImpl members) {
-        this.clanService = clanService;
+    ClanImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, int id, LocalDateTime dateCreated, String name, ClanMembersImpl members) {
+        this.messageConfig = messageConfig;
+        this.executors = executors;
         this.id = id;
         this.dateCreated = dateCreated;
         this.name = name;
         this.members = members;
     }
 
-    ClanImpl(ClanServiceImpl clanService, int id, LocalDateTime dateCreated, String name, Player owner) {
-        this.clanService = clanService;
+    ClanImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, int id, LocalDateTime dateCreated, String name, Player owner) {
+        this.messageConfig = messageConfig;
+        this.executors = executors;
         this.id = id;
         this.dateCreated = dateCreated;
         this.name = ColorUtils.color(name);
 
-        members = new ClanMembersImpl(this);
+        members = new ClanMembersImpl(executors, this);
         members.addOwnerMember(owner);
-    }
-
-    ClanServiceImpl getClanService() {
-        return clanService;
     }
 
     @Override
@@ -59,7 +60,7 @@ class ClanImpl implements Clan {
     private String renameClanSilently(String name) {
         String old = this.name;
         this.name = ColorUtils.color(name);
-        clanService.getExecutors().async().update("UPDATE clans SET name = ? WHERE id = ?", this.name, id);
+        executors.async().update("UPDATE clans SET name = ? WHERE id = ?", this.name, id);
         return old;
     }
 
@@ -67,15 +68,15 @@ class ClanImpl implements Clan {
     public String renameClan(ClanMember member, String name) {
         String old = renameClanSilently(name);
 
-        member.accept(player -> clanService.getMessageConfig().getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_LOCAL)
+        member.accept(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_LOCAL)
                 .placeholder("%old_name%", old)
                 .placeholder("%new_name%", name).send(player));
 
-        send(clanService.getMessageConfig().getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_LOCAL)
+        send(messageConfig.getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_LOCAL)
                 .placeholder("%name%", member.getName())
                 .placeholder("%old_name%", old)
                 .placeholder("%new_name%", name));
-        clanService.getMessageConfig().getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_GLOBAL)
+        messageConfig.getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_GLOBAL)
                 .placeholder("%name%", member.getName())
                 .placeholder("%old_name%", old)
                 .placeholder("%new_name%", name)
@@ -100,7 +101,8 @@ class ClanImpl implements Clan {
         ClanImpl clan = (ClanImpl) o;
         return new EqualsBuilder()
                 .append(id, clan.id)
-                .append(clanService, clan.clanService)
+                .append(messageConfig, clan.messageConfig)
+                .append(executors, clan.executors)
                 .append(dateCreated, clan.dateCreated)
                 .append(name, clan.name)
                 .append(members, clan.members)
@@ -110,7 +112,8 @@ class ClanImpl implements Clan {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(clanService)
+                .append(messageConfig)
+                .append(executors)
                 .append(id)
                 .append(dateCreated)
                 .append(name)
