@@ -23,7 +23,8 @@ public enum Messages implements MessagePath {
             "&7[&cArbuzik&fClans&7] &7&l| &fПомощь по командам:",
             "&c/clan create [Название] &7&l- &fСоздать клан"
     )),
-    CLAN_CREATE_ALREADY_CLAN("clan.create.alreadyInClan", "&cВы уже состоите в клане!");
+    ALREADY_CLAN("alreadyInClan", "&cВы уже состоите в клане!"),
+    NOT_CLAN("notClan", "&cВы не состоите в клане!");
 
     private final String path, defaultValue;
 

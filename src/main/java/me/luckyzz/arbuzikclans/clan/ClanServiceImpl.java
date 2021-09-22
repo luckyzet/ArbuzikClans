@@ -6,15 +6,12 @@ import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckkyyz.luckapi.provider.economy.EconomicUser;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
-import me.luckkyyz.luckapi.util.date.DateFormat;
 import me.luckkyyz.luckapi.util.date.DateUtil;
 import me.luckkyyz.luckapi.util.date.DateZone;
 import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.config.Settings;
-import me.luckyzz.arbuzikclans.name.BelowNameService;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -109,7 +106,7 @@ public class ClanServiceImpl implements ClanService {
             }
 
             if(hasClanByMember(owner)) {
-                messageConfig.getMessage(Messages.CLAN_CREATE_ALREADY_CLAN).send(owner);
+                messageConfig.getMessage(Messages.ALREADY_CLAN).send(owner);
                 return;
             }
 
