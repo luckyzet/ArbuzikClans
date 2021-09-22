@@ -2,6 +2,10 @@ package me.luckyzz.arbuzikclans.config;
 
 import me.luckkyyz.luckapi.config.MessagePath;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum Messages implements MessagePath {
 
     CLAN_RENAME_SUCCESS_LOCAL("clan.rename.success.local", "&fКлан, в котором Вы состоите был переименован игроком &c%name%&f! &c%old_name% &7&l> &c%new_name%"),
@@ -14,7 +18,12 @@ public enum Messages implements MessagePath {
     NOT_COMMAND("notCommand", "&cТакой команды не существует!"),
     SOMETHING_WENT_WRONG("somethingWentWrong", "&cЧто-то пошло не так! Обратитесь к Администратору"),
     CLAN_CREATE_USAGE("clan.create.usage", "&cИспользуй - /clan create [Название]"),
-    CLAN_CREATE_SUCCESS("clan.create.success", "&fВы успешно создали клан &c%name%&f!");
+    CLAN_CREATE_SUCCESS("clan.create.success", "&fВы успешно создали клан &c%name%&f!"),
+    CLAN_HELP("clan.help", Arrays.asList(
+            "&7[&fArbuzik&cClans&7] &7&l| &fПомощь по командам:",
+            "&c/clan create [Название] &7&l- &fСоздать клан"
+    )),
+    ;
 
     private final String path, defaultValue;
 
@@ -23,6 +32,10 @@ public enum Messages implements MessagePath {
         this.defaultValue = defaultValue;
     }
 
+    Messages(String path, List<String> defaultValues) {
+        this.path = path;
+        this.defaultValue = String.join("\n", defaultValues);
+    }
 
     @Override
     public String getDefaultValue() {

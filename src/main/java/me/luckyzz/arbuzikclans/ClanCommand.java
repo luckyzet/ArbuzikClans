@@ -17,7 +17,7 @@ final class ClanCommand {
                 .addCheck(ExecutingChecks.permission(Permissions.CLAN), actions.messageSend(Messages.NO_PERMISSION))
                 .addCheck(ExecutingChecks.player(), actions.messageSend(Messages.ONLY_PLAYER))
                 .whenSubCommandAbsent(actions.messageSend(Messages.NOT_COMMAND))
-                .whenArgumentAbsent(actions.messageSend(Messages.NOT_COMMAND)) // help
+                .whenArgumentAbsent(session -> {})
                 .addSubCommand("create", ExecutingStrategy.newBuilder()
                         .commandStrategy()
                         .addCheck(ExecutingChecks.permission(Permissions.CLAN_CREATE), actions.messageSend(Messages.NO_PERMISSION))
@@ -27,8 +27,8 @@ final class ClanCommand {
                             String name = arguments.get(1);
 
                             clanService.createClan(name, player);
-                        })
-                )
+                        }))
+                .addSubCommand("help", ExecutingStrategy.newBuilder().commandStrategy().addAction(actions.messageSend(Messages.CLAN_HELP)))
         );
     }
 
