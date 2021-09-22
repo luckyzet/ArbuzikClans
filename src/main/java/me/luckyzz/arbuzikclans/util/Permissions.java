@@ -10,6 +10,8 @@ public final class Permissions {
 
     public static final PermissionNode CLAN = PermissionNode.node("arbuzikclans.clan");
 
+    public static final PermissionNode CLAN_CHAT = PermissionNode.node("arbuzikclans.clan.chat");
+
     public static final PermissionNode CLAN_CREATE = PermissionNode.node("arbuzikclans.clan.create");
 
 }

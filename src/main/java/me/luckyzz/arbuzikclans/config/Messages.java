@@ -24,7 +24,9 @@ public enum Messages implements MessagePath {
             "&c/clan create [Название] &7&l- &fСоздать клан"
     )),
     ALREADY_CLAN("alreadyInClan", "&cВы уже состоите в клане!"),
-    NOT_CLAN("notClan", "&cВы не состоите в клане!");
+    NOT_CLAN("notClan", "&cВы не состоите в клане!"),
+    NOT_ACCESS("notAccess", "&cУ Вас недостаточно полномочий, чтобы сделать это!"),
+    CLAN_CHAT_EMPTY("clan.chat.emptyMessage", "&cВы не можете отправить в чат пустое сообщение!");
 
     private final String path, defaultValue;
 

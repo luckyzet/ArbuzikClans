@@ -19,8 +19,8 @@ final class ClanCommand {
 
         ChatCommand.registerCommand("clan", ExecutingStrategy.newBuilder()
                 .subCommandStrategy()
-                .addCheck(ExecutingChecks.permission(Permissions.CLAN), actions.messageSend(Messages.NO_PERMISSION))
                 .addCheck(ExecutingChecks.player(), actions.messageSend(Messages.ONLY_PLAYER))
+                .addCheck(ExecutingChecks.permission(Permissions.CLAN), actions.messageSend(Messages.NO_PERMISSION))
                 .whenSubCommandAbsent(actions.messageSend(Messages.NOT_COMMAND))
                 .whenArgumentAbsent((executor, arguments) -> {
                     Player player = executor.getPlayer();
@@ -43,6 +43,29 @@ final class ClanCommand {
                             clanService.createClan(name, player);
                         }))
                 .addSubCommand("help", ExecutingStrategy.newBuilder().commandStrategy().addAction(actions.messageSend(Messages.CLAN_HELP)))
+        );
+
+        ChatCommand.registerCommand("clanchat", ExecutingStrategy.newBuilder()
+                .commandStrategy()
+                .addCheck(ExecutingChecks.player(), actions.messageSend(Messages.ONLY_PLAYER))
+                .addCheck(ExecutingChecks.permission(Permissions.CLAN_CHAT), actions.messageSend(Messages.NO_PERMISSION))
+                .addCheck(session -> clanService.hasClanByMember(session.getExecutor().getPlayer()), actions.messageSend(Messages.NOT_CLAN))
+                .addCheck(ExecutingChecks.argumentsLength(1, Integer.MAX_VALUE), actions.messageSend(Messages.CLAN_CHAT_EMPTY))
+                .addAction((executor, arguments) -> {
+                    Player player = executor.getPlayer();
+                    Clan clan = clanService.getClanByMember(player);
+                    if(clan == null) {
+                        return;
+                    }
+                    ClanMember member = clan.getMembers().getMember(player);
+
+                    StringBuilder builder = new StringBuilder();
+                    while (arguments.hasNext()) {
+                        builder.append(arguments.next()).append(" ");
+                    }
+
+                    member.sendChat(builder.toString());
+                })
         );
     }
 

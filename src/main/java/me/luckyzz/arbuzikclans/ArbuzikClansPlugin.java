@@ -26,9 +26,8 @@ import org.bukkit.plugin.java.annotation.plugin.author.Author;
 @Plugin(name = "ArbuzikClans", version = "0.1.0-SNAPSHOT")
 @Author("luckyzz")
 @ApiVersion(ApiVersion.Target.v1_16)
-@Commands(
-        @Command(name = "clan", aliases = {"clans", "c"})
-)
+@Command(name = "clan", aliases = {"clans", "c"})
+@Command(name = "clanchat", aliases = {"cc", "cchat", "clanc"})
 @SoftDependency("WorldEdit")
 @SoftDependency("WorldGuard")
 @SoftDependency("Vault")

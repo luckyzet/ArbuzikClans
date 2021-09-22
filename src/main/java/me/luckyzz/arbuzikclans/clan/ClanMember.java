@@ -11,6 +11,10 @@ public interface ClanMember {
 
     String getName();
 
+    ClanRank getRank();
+
+    void setRank(ClanRank rank, ClanMember member);
+
     default Player getPlayer() {
         return PlayerFilters.byName(getName()).orElse(null);
     }
@@ -22,5 +26,7 @@ public interface ClanMember {
         }
         consumer.accept(player);
     }
+
+    void sendChat(String message);
 
 }

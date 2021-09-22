@@ -8,6 +8,7 @@ class ClanMemberImpl implements ClanMember {
 
     private ClanImpl clan;
     private final String name;
+    private ClanRank rank;
 
     ClanMemberImpl(ClanImpl clan, String name) {
         this.clan = clan;
@@ -37,6 +38,21 @@ class ClanMemberImpl implements ClanMember {
     }
 
     @Override
+    public ClanRank getRank() {
+        return rank;
+    }
+
+    @Override
+    public void setRank(ClanRank rank, ClanMember member) {
+        this.rank = rank;
+    }
+
+    @Override
+    public void sendChat(String message) {
+
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -44,6 +60,7 @@ class ClanMemberImpl implements ClanMember {
         return new EqualsBuilder()
                 .append(clan, that.clan)
                 .append(name, that.name)
+                .append(rank, that.rank)
                 .isEquals();
     }
 
@@ -52,6 +69,7 @@ class ClanMemberImpl implements ClanMember {
         return new HashCodeBuilder(17, 37)
                 .append(clan)
                 .append(name)
+                .append(rank)
                 .toHashCode();
     }
 }

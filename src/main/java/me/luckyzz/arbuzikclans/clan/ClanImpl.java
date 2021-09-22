@@ -67,6 +67,11 @@ class ClanImpl implements Clan {
 
     @Override
     public String renameClan(ClanMember member, String name) {
+        if(!member.getRank().hasPossibility(ClanRank.Possibility.RENAME)) {
+            member.accept(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
+            return this.name;
+        }
+
         String old = renameClanSilently(name);
 
         member.accept(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_RENAME_SUCCESS_LOCAL)
