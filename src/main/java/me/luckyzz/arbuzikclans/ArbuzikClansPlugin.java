@@ -10,14 +10,9 @@ import me.luckkyyz.luckapi.database.serialize.DatabaseSerializers;
 import me.luckkyyz.luckapi.menu.LuckMenuService;
 import me.luckkyyz.luckapi.menu.MenuService;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
-import me.luckyzz.arbuzikclans.clan.ClanService;
-import me.luckyzz.arbuzikclans.clan.ClanServiceImpl;
 import me.luckyzz.arbuzikclans.config.Messages;
-import me.luckyzz.arbuzikclans.name.BelowNameService;
-import me.luckyzz.arbuzikclans.name.ArmorStandNameService;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
-import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
@@ -38,8 +33,6 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
 
     private HikariDatabase clanDatabase;
 
-    private ClanService clanService;
-
     @Override
     public void onEnable() {
         luckApi = LuckApi.bootstrapWith(this);
@@ -52,9 +45,6 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         clanDatabase = DatabaseSerializers.yaml().deserialize(config.getSection("database"));
         QueryExecutors clanExecutors = new HikariQueryExecutors(this, clanDatabase);
 
-        clanService = new ClanServiceImpl(config, messageConfig, economyProvider, clanExecutors);
-
-        new ClanCommand(messageConfig, clanService);
     }
 
     @Override
@@ -64,9 +54,6 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         }
         if(clanDatabase != null) {
             clanDatabase.close();
-        }
-        if(clanService != null) {
-            clanService.cancel();
         }
     }
 }
