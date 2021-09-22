@@ -1,6 +1,8 @@
-package me.luckyzz.arbuzikclans.clan;
+package me.luckyzz.arbuzikclans.clan.member;
 
 import me.luckkyyz.luckapi.util.player.PlayerFilters;
+import me.luckyzz.arbuzikclans.clan.Clan;
+import me.luckyzz.arbuzikclans.clan.rank.ClanRank;
 import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;

@@ -3,6 +3,8 @@ package me.luckyzz.arbuzikclans.clan;
 import me.luckkyyz.luckapi.message.Message;
 import me.luckkyyz.luckapi.util.date.DateFormat;
 import me.luckkyyz.luckapi.util.date.FormatDate;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
 
 import java.time.LocalDateTime;
 

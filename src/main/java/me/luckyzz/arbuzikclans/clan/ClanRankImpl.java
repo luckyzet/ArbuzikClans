@@ -1,6 +1,10 @@
 package me.luckyzz.arbuzikclans.clan;
 
 import me.luckkyyz.luckapi.util.color.ColorUtils;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.rank.ClanRank;
+import me.luckyzz.arbuzikclans.clan.rank.RankPossibilities;
+import me.luckyzz.arbuzikclans.clan.rank.RankPossibility;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -11,9 +15,9 @@ class ClanRankImpl implements ClanRank {
     private ClanImpl clan;
     private final int index;
     private String prefix;
-    private final List<Possibility> possibilities;
+    private final RankPossibilities possibilities;
 
-    ClanRankImpl(int index, String prefix, List<Possibility> possibilities) {
+    ClanRankImpl(int index, String prefix, RankPossibilities possibilities) {
         this.index = index;
         this.prefix = prefix;
         this.possibilities = possibilities;
@@ -44,8 +48,8 @@ class ClanRankImpl implements ClanRank {
     }
 
     @Override
-    public boolean hasPossibility(Possibility possibility) {
-        return possibilities.contains(possibility);
+    public boolean hasPossibility(RankPossibility possibility) {
+        return possibilities.hasPossibility(possibility);
     }
 
     @Override

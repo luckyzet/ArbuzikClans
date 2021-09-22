@@ -1,15 +1,12 @@
 package me.luckyzz.arbuzikclans;
 
-import me.luckkyyz.luckapi.api.Handle;
 import me.luckkyyz.luckapi.command.*;
 import me.luckkyyz.luckapi.config.MessageConfig;
-import me.luckkyyz.luckapi.menu.PreparedMenu;
 import me.luckyzz.arbuzikclans.clan.Clan;
-import me.luckyzz.arbuzikclans.clan.ClanMember;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.util.Permissions;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 final class ClanCommand {

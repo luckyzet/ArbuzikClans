@@ -1,6 +1,8 @@
 package me.luckyzz.arbuzikclans.clan;
 
 import me.luckkyyz.luckapi.database.QueryExecutors;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;

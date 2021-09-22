@@ -4,13 +4,16 @@ import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckkyyz.luckapi.message.Message;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
+import me.luckyzz.arbuzikclans.clan.rank.ClanRank;
+import me.luckyzz.arbuzikclans.clan.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
 import java.time.LocalDateTime;
-import java.util.function.Function;
 
 class ClanImpl implements Clan {
 
@@ -67,7 +70,7 @@ class ClanImpl implements Clan {
 
     @Override
     public String renameClan(ClanMember member, String name) {
-        if(!member.getRank().hasPossibility(ClanRank.Possibility.RENAME)) {
+        if(!member.getRank().hasPossibility(RankPossibility.RENAME)) {
             member.accept(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
             return this.name;
         }

@@ -1,5 +1,7 @@
-package me.luckyzz.arbuzikclans.clan;
+package me.luckyzz.arbuzikclans.clan.member;
 
+import me.luckyzz.arbuzikclans.clan.Clan;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
