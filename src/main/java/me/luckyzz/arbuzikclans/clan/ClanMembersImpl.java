@@ -12,17 +12,21 @@ class ClanMembersImpl implements ClanMembers {
 
     private final QueryExecutors executors;
 
-    private final ClanImpl clan;
-    private final Map<String, ClanMember> members;
+    private ClanImpl clan;
+    private final Map<String, ClanMemberImpl> members;
 
-    ClanMembersImpl(QueryExecutors executors, ClanImpl clan, Map<String, ClanMember> members) {
+    ClanMembersImpl(QueryExecutors executors, Map<String, ClanMemberImpl> members) {
         this.executors = executors;
-        this.clan = clan;
         this.members = members;
     }
 
     ClanMembersImpl(QueryExecutors executors, ClanImpl clan) {
-        this(executors, clan, new HashMap<>());
+        this(executors, new HashMap<>());
+        setClan(clan);
+    }
+
+    void setClan(ClanImpl clan) {
+        this.clan = clan;
     }
 
     @Override
@@ -42,7 +46,7 @@ class ClanMembersImpl implements ClanMembers {
 
     @Override
     public void addOwnerMember(Player player) {
-        ClanMember member = new ClanMemberImpl(clan, player);
+        ClanMemberImpl member = new ClanMemberImpl(clan, player);
         members.put(member.getName(), member);
         executors.async().update("INSERT INTO clanMembers VALUES (?, ?)", member.getName(), member.getClan().getId());
     }

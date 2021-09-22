@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 class ClanMemberImpl implements ClanMember {
 
-    private final ClanImpl clan;
+    private ClanImpl clan;
     private final String name;
 
     ClanMemberImpl(ClanImpl clan, String name) {
@@ -16,6 +16,14 @@ class ClanMemberImpl implements ClanMember {
 
     ClanMemberImpl(ClanImpl clan, Player player) {
         this(clan, player.getName());
+    }
+
+    ClanMemberImpl(String name) {
+        this.name = name;
+    }
+
+    void setClan(ClanImpl clan) {
+        this.clan = clan;
     }
 
     @Override

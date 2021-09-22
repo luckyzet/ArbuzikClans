@@ -1,13 +1,12 @@
 package me.luckyzz.arbuzikclans.clan;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.config.SettingConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckkyyz.luckapi.provider.economy.EconomicUser;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
+import me.luckkyyz.luckapi.util.date.DateFormat;
 import me.luckkyyz.luckapi.util.date.DateUtil;
 import me.luckkyyz.luckapi.util.date.DateZone;
 import me.luckkyyz.luckapi.util.date.FormatDate;
@@ -17,6 +16,9 @@ import me.luckyzz.arbuzikclans.name.BelowNameService;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -24,44 +26,73 @@ import java.util.concurrent.TimeoutException;
 
 public class ClanServiceImpl implements ClanService {
 
-    private final Plugin plugin;
     private final SettingConfig config;
     private final MessageConfig<Messages> messageConfig;
     private final EconomyProvider economyProvider;
-    private final BelowNameService belowNameService;
 
     private final QueryExecutors executors;
-    private final Cache<String, Clan> cache;
+    private final Map<Integer, Clan> clanMap = new HashMap<>();
 
-    public ClanServiceImpl(Plugin plugin, SettingConfig config, MessageConfig<Messages> messageConfig, EconomyProvider economyProvider, BelowNameService belowNameService, QueryExecutors executors) {
-        this.plugin = plugin;
+    public ClanServiceImpl(SettingConfig config, MessageConfig<Messages> messageConfig, EconomyProvider economyProvider, QueryExecutors executors) {
         this.config = config;
         this.messageConfig = messageConfig;
         this.economyProvider = economyProvider;
-        this.belowNameService = belowNameService;
         this.executors = executors;
-
-        cache = CacheBuilder.newBuilder()
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .expireAfterWrite(10, TimeUnit.MINUTES)
-                .initialCapacity(30)
-                .build();
 
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clans` (" +
                 "`id` INT NOT NULL PRIMARY KEY, " +
-                "`date` VARCHAR(64) NOT NULL, " +
+                "`dateCreated` VARCHAR(64) NOT NULL, " +
                 "`name` VARCHAR(64) NOT NULL" +
                 ")");
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanMembers` (" +
                 "`name` VARCHAR(64) NOT NULL PRIMARY KEY, " +
                 "`clan` INT NOT NULL" +
                 ")");
+
+        reload();
+    }
+
+    @Override
+    public void reload() {
+        clanMap.clear();
+
+        executors.async().result("SELECT * FROM clans", result -> {
+            while (result.next()) {
+                int id = result.getInt("id");
+                LocalDateTime dateCreated = LocalDateTime.now();
+                //LocalDateTime dateCreated = DateFormat.dateTimeFormatter().parse(result.getString("dateCreated"), FormatDate.DATE_TIME);
+                String name = result.getString("name");
+
+                Map<String, ClanMemberImpl> memberMap = new HashMap<>();
+                executors.sync().result("SELECT * FROM clanMembers WHERE clan = ?", memberResult -> {
+                    while (memberResult.next()) {
+                        String memberName = memberResult.getString("name");
+                        ClanMemberImpl member = new ClanMemberImpl(memberName);
+
+                        memberMap.put(member.getName(), member);
+                    }
+                }, id);
+
+                ClanMembersImpl members = new ClanMembersImpl(executors, memberMap);
+                ClanImpl clan = new ClanImpl(messageConfig, executors, id, dateCreated, name, members);
+                clanMap.put(clan.getId(), clan);
+                members.setClan(clan);
+                memberMap.values().forEach(member -> member.setClan(clan));
+            }
+        });
+    }
+
+    @Override
+    public Clan getClanByMember(String name) {
+        return clanMap.values().stream()
+                .filter(clan -> clan.getMembers().getMember(name) != null)
+                .findFirst().orElse(null);
     }
 
     private CompletableFuture<Integer> getLastId() {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         executors.async().result("SELECT id FROM clans ORDER BY id DESC LIMIT 1", result -> {
-            if(!result.next()) {
+            if (!result.next()) {
                 future.complete(0);
                 return;
             }
@@ -74,6 +105,11 @@ public class ClanServiceImpl implements ClanService {
     public void createClan(String name, Player owner) {
         CompletableFuture.runAsync(() -> {
             if (!owner.isOnline()) {
+                return;
+            }
+
+            if(hasClanByMember(owner)) {
+                messageConfig.getMessage(Messages.CLAN_CREATE_ALREADY_CLAN).send(owner);
                 return;
             }
 
@@ -107,7 +143,7 @@ public class ClanServiceImpl implements ClanService {
             }
 
             Clan clan = new ClanImpl(messageConfig, executors, id, DateUtil.getDate(DateZone.MOSCOW), name, owner);
-            cache.put(clan.getName(), clan);
+            clanMap.put(clan.getId(), clan);
 
             executors.sync().update("INSERT INTO clans VALUES (?, ?, ?)", clan.getId(), clan.getDateCreated(FormatDate.DATE_TIME), clan.getName());
             messageConfig.getAdaptiveMessage(Messages.CLAN_CREATE_SUCCESS)
@@ -118,6 +154,6 @@ public class ClanServiceImpl implements ClanService {
 
     @Override
     public void cancel() {
-        cache.invalidateAll();
+        clanMap.clear();
     }
 }

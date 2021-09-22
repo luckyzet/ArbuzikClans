@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
 import java.time.LocalDateTime;
+import java.util.function.Function;
 
 class ClanImpl implements Clan {
 

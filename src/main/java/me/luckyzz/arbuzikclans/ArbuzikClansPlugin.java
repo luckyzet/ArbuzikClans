@@ -36,7 +36,6 @@ import org.bukkit.plugin.java.annotation.plugin.author.Author;
 public final class ArbuzikClansPlugin extends JavaPlugin {
 
     private LuckApi luckApi;
-    private BelowNameService belowNameService;
 
     private HikariDatabase clanDatabase;
 
@@ -45,9 +44,7 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         luckApi = LuckApi.bootstrapWith(this);
-        MenuService menuService = luckApi.registerService(MenuService.class, LuckMenuService::new);
-
-        belowNameService = new ArmorStandNameService(this);
+        luckApi.registerService(MenuService.class, LuckMenuService::new);
 
         SettingConfig config = new SettingConfig(this);
         MessageConfig<Messages> messageConfig = new MessageConfig<>(this, Messages.values());
@@ -56,7 +53,7 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         clanDatabase = DatabaseSerializers.yaml().deserialize(config.getSection("database"));
         QueryExecutors clanExecutors = new HikariQueryExecutors(this, clanDatabase);
 
-        clanService = new ClanServiceImpl(this, config, messageConfig, economyProvider, belowNameService, clanExecutors);
+        clanService = new ClanServiceImpl(config, messageConfig, economyProvider, clanExecutors);
 
         new ClanCommand(messageConfig, clanService);
     }
@@ -65,9 +62,6 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
     public void onDisable() {
         if(luckApi != null) {
             luckApi.cancel();
-        }
-        if(belowNameService != null) {
-            belowNameService.cancel();
         }
         if(clanDatabase != null) {
             clanDatabase.close();

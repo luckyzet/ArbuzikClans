@@ -20,10 +20,10 @@ public enum Messages implements MessagePath {
     CLAN_CREATE_USAGE("clan.create.usage", "&cИспользуй - /clan create [Название]"),
     CLAN_CREATE_SUCCESS("clan.create.success", "&fВы успешно создали клан &c%name%&f!"),
     CLAN_HELP("clan.help", Arrays.asList(
-            "&7[&fArbuzik&cClans&7] &7&l| &fПомощь по командам:",
+            "&7[&cArbuzik&fClans&7] &7&l| &fПомощь по командам:",
             "&c/clan create [Название] &7&l- &fСоздать клан"
     )),
-    ;
+    CLAN_CREATE_ALREADY_CLAN("clan.create.alreadyInClan", "&cВы уже состоите в клане!");
 
     private final String path, defaultValue;
 
