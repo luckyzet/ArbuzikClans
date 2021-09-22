@@ -1,0 +1,14 @@
+# Включен ли цветокор в названии клана
+clanNameColors: true
+
+# Сумма, необходимая для создания клана
+clanCreateMoney: 100
+
+# Настройки подключения к базе данных
+database:
+  type: MYSQL
+  hostname: 127.0.0.1
+  port: 3306
+  database: "common_test"
+  username: "root"
+  password: ""
