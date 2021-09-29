@@ -4,7 +4,7 @@ import me.luckkyyz.luckapi.util.player.PlayerFilters;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuest;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
-import me.luckyzz.arbuzikclans.clan.member.rank.ClanRanks;
+import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -40,5 +40,17 @@ public interface ClanMember {
     Collection<MemberQuest> getQuests();
 
     void changeQuests(Collection<MemberQuest> quests);
+
+    int getQuestsCompleted();
+
+    void changeQuestsCompleted(int amount);
+
+    default void addQuestCompleted() {
+        changeQuestsCompleted(1);
+    }
+
+    default boolean hasPossibility(RankPossibility possibility) {
+        return getRank().hasPossibility(possibility);
+    }
 
 }

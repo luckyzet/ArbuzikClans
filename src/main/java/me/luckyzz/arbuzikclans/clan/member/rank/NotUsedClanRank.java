@@ -11,7 +11,7 @@ public interface NotUsedClanRank {
     RankPossibilities getPossibilities();
 
     default boolean hasPossibility(RankPossibility possibility) {
-        return getPossibilities().hasPossibility(possibility);
+        return getPossibilities().hasPossibility(possibility) || getPossibilities().hasPossibility(RankPossibility.ALL);
     }
 
     RankRole getRole();

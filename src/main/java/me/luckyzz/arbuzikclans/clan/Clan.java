@@ -1,11 +1,12 @@
 package me.luckyzz.arbuzikclans.clan;
 
+import me.luckkyyz.luckapi.message.Message;
+import me.luckkyyz.luckapi.message.StringMessage;
 import me.luckkyyz.luckapi.util.date.DateFormat;
 import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
-import me.luckyzz.arbuzikclans.clan.member.invite.ClanInvites;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRanks;
 import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrades;
@@ -34,18 +35,18 @@ public interface Clan {
 
     int getMoney();
 
-    void addMoney(int amount, ClanMember member);
-
-    void takeMoney(int amount, ClanMember member);
-
     int getCoins();
 
-    void addCoins(int amount, ClanMember member);
+    void changeCoinsSilently(int amount);
 
     ClanRegion getRegion();
 
     ClanChat getChat();
 
-    ClanInvites getInvites();
+    void send(Message message);
+
+    default void send(String message) {
+        send(new StringMessage(message));
+    }
 
 }

@@ -4,6 +4,18 @@ clanNameColors: true
 # Сумма, необходимая для создания клана
 clanCreateMoney: 100
 
+# Время, в течении которого можно принять запрос в клан в сек.
+clanInviteTime: 30
+
+# Настройки региона
+region:
+  # Размер региона
+  size: 64
+  # Предмет
+  item:
+    type: DIAMOND_BLOCK
+    display: "&eКлановый регион"
+
 # Настройки подключения к базе данных
 database:
   type: MYSQL
@@ -12,3 +24,145 @@ database:
   database: "common_test"
   username: "root"
   password: ""
+
+# Начальное максмальное кол-во участников клана
+maxMembersDefault: 5
+
+# Настройки рангов
+ranks:
+  1:
+    prefix: "&7[&eДефолт&7]"
+  2:
+    prefix: "&7[&eДефолт 2&7]"
+  3:
+    prefix: "&7[&eДефолт 3&7]"
+  4:
+    prefix: "&7[&eДефолт 4&7]"
+  5:
+    prefix: "&7[&eДефолт 5&7]"
+  6:
+    role: VICE
+    prefix: "&7[&eЗаместитель&7]"
+  7:
+    role: OWNER
+    prefix: "&7[&eСоздатель&7]"
+
+# Уровни сложности квестов. Увеличиваются в зависимости от пройденного кол-ва квестов у каждого игрока в клане
+questsCompleted:
+  low:
+    from: 0
+    to: 10
+  normal:
+    from: 11
+    to: 20
+  high:
+    from: 21
+    to: 100
+
+quests:
+  low:
+    minCount: 1
+    maxCount: 3
+    quests:
+      first:
+        type: KILL
+        target: ZOMBIE
+        minCount: 1
+        maxCount: 5
+      second:
+        type: KILL
+        target: ZOMBIE
+        minCount: 3
+        maxCount: 8
+      third:
+        type: BREAK_BLOCKS
+        target: DIAMOND_ORE
+        minCount: 1
+        maxCount: 5
+  normal:
+    minCount: 3
+    maxCount: 5
+    quests:
+      first:
+        type: KILL
+        target: ZOMBIE
+        minCount: 3
+        maxCount: 8
+      second:
+        type: KILL
+        target: ZOMBIE
+        minCount: 5
+        maxCount: 10
+      third:
+        type: BREAK_BLOCKS
+        target: DIAMOND_ORE
+        minCount: 5
+        maxCount: 15
+  high:
+    minCount: 1
+    maxCount: 3
+    quests:
+      first:
+        type: KILL
+        target: ZOMBIE
+        minCount: 1
+        maxCount: 3
+      second:
+        type: KILL
+        target: ZOMBIE
+        minCount: 10
+        maxCount: 21
+      third:
+        type: BREAK_BLOCKS
+        target: DIAMOND_ORE
+        minCount: 5
+        maxCount: 35
+
+upgrades:
+  1:
+    type: MEMBER_SLOTS
+    amount: 6
+    level: 1
+    clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан до 6 слотов!"
+    requirements:
+      coins: 1
+  2:
+    type: MEMBER_SLOTS
+    amount: 7
+    level: 2
+    clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан до 7 слотов!"
+    requirements:
+      coins: 1
+  3:
+    type: MEMBER_SLOTS
+    amount: 8
+    level: 3
+    clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан до 8 слотов!"
+    requirements:
+      coins: 1
+  4:
+    type: ITEM
+    requirements:
+      coins: 1
+    item:
+      type: DIAMOND
+      amount: 3
+      display: "&cАлмаз из шопа"
+    daysOfWeek:
+      - "WEDNESDAY"
+      - "FRIDAY"
+    price: 100
+    clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан, в магазин добавились новые предметы (по средам и пятницам)!"
+  5:
+    type: ITEM
+    requirements:
+      coins: 1
+    item:
+      type: DIAMOND
+      amount: 5
+      display: "&cАлмаз из шопа 2"
+    daysOfWeek:
+      - "WEDNESDAY"
+      - "FRIDAY"
+    price: 100
+    clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан, в магазин добавились новые предметы (по средам и пятницам)!"

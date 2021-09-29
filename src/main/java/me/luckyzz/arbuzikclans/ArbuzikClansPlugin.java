@@ -2,7 +2,6 @@ package me.luckyzz.arbuzikclans;
 
 import me.luckkyyz.luckapi.LuckApi;
 import me.luckkyyz.luckapi.config.MessageConfig;
-import me.luckkyyz.luckapi.config.SettingConfig;
 import me.luckkyyz.luckapi.database.HikariDatabase;
 import me.luckkyyz.luckapi.database.HikariQueryExecutors;
 import me.luckkyyz.luckapi.database.QueryExecutors;
@@ -10,6 +9,7 @@ import me.luckkyyz.luckapi.database.serialize.DatabaseSerializers;
 import me.luckkyyz.luckapi.menu.LuckMenuService;
 import me.luckkyyz.luckapi.menu.MenuService;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
+import me.luckyzz.arbuzikclans.config.ClanConfig;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -38,12 +38,13 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         luckApi = LuckApi.bootstrapWith(this);
         luckApi.registerService(MenuService.class, LuckMenuService::new);
 
-        SettingConfig config = new SettingConfig(this);
+        ClanConfig config = new ClanConfig(this);
         MessageConfig<Messages> messageConfig = new MessageConfig<>(this, Messages.values());
         EconomyProvider economyProvider = EconomyProvider.openProvider();
 
         clanDatabase = DatabaseSerializers.yaml().deserialize(config.getSection("database"));
         QueryExecutors clanExecutors = new HikariQueryExecutors(this, clanDatabase);
+
 
     }
 

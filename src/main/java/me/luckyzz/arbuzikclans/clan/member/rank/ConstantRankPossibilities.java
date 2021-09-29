@@ -12,4 +12,14 @@ public final class ConstantRankPossibilities {
 
     public static final RankPossibilities DEFAULT = new RankPossibilities();
 
+    public static RankPossibilities fromRole(RankRole role) {
+        if (role == RankRole.VICE) {
+            return VICE;
+        }
+        if (role == RankRole.OWNER) {
+            return OWNER;
+        }
+        return DEFAULT;
+    }
+
 }

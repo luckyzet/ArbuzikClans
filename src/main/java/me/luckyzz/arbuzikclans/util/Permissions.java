@@ -14,4 +14,6 @@ public final class Permissions {
 
     public static final PermissionNode CLAN_CREATE = PermissionNode.node("arbuzikclans.clan.create");
 
+    public static final PermissionNode REGION_BYPASS = PermissionNode.node("arbuzikclans.region.bypass");
+
 }

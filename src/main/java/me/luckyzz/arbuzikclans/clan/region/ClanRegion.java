@@ -5,7 +5,6 @@ import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
 public interface ClanRegion {
 
@@ -19,10 +18,10 @@ public interface ClanRegion {
 
     Location getCenterLocation();
 
-    void setCenterLocation(Location location, ClanMember member);
+    boolean setCenterLocation(Location location, ClanMember member);
 
-    default void setCenterLocation(Block block, ClanMember member) {
-        setCenterLocation(block.getLocation(), member);
+    default boolean setCenterLocation(Block block, ClanMember member) {
+        return setCenterLocation(block.getLocation(), member);
     }
 
     default Block getCenterBlock() {
@@ -46,5 +45,7 @@ public interface ClanRegion {
     void setAccessBlocks(boolean can, ClanMember forMember, ClanMember member);
 
     void giveItem(ClanMember member);
+
+    void breakRegion(ClanMember member);
 
 }

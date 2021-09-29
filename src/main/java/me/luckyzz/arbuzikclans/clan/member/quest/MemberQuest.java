@@ -3,17 +3,15 @@ package me.luckyzz.arbuzikclans.clan.member.quest;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 
-public interface MemberQuest extends MemberDayQuest {
+public interface MemberQuest {
 
-    @Override
-    default MemberQuest toMemberQuest(ClanMember member) {
-        throw new UnsupportedOperationException();
+    default boolean isTarget(Object value) {
+        return getTarget().equals(value);
     }
 
-    @Override
-    default MemberQuest toMemberQuest(int count, ClanMember member) {
-        throw new UnsupportedOperationException();
-    }
+    Object getTarget();
+
+    String getTargetName();
 
     default Clan getClan() {
         return getMember().getClan();
