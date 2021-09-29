@@ -1,7 +1,5 @@
 package me.luckyzz.arbuzikclans.clan.member.rank;
 
-import me.luckyzz.arbuzikclans.clan.Clan;
-
 public interface NotUsedClanRank {
 
     int getIndex();
@@ -16,6 +14,6 @@ public interface NotUsedClanRank {
 
     RankRole getRole();
 
-    ClanRank toUsing(Clan clan);
+    ClanRank toUsing();
 
 }

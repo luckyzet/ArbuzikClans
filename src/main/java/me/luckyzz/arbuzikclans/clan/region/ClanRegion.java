@@ -44,6 +44,10 @@ public interface ClanRegion {
 
     void setAccessBlocks(boolean can, ClanMember forMember, ClanMember member);
 
+    void setAccessChestSilently(boolean can, ClanMember forMember);
+
+    void setAccessBlocksSilently(boolean can, ClanMember forMember);
+
     void giveItem(ClanMember member);
 
     void breakRegion(ClanMember member);

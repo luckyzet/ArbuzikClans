@@ -33,6 +33,8 @@ public interface ClanMembers {
         return getMember(player.getName());
     }
 
+    void addMemberSilently(Player player, RankRole role);
+
     void addMember(Player player, ClanMember member);
 
     void removeMember(ClanMember member);

@@ -251,6 +251,38 @@ class ClanRegionImpl implements ClanRegion {
     }
 
     @Override
+    public void setAccessChestSilently(boolean can, ClanMember forMember) {
+        if (accessChestWhitelist.contains(forMember) == can) {
+            return;
+        }
+
+        if (can) {
+            accessChestWhitelist.add(forMember);
+        } else {
+            accessChestWhitelist.remove(forMember);
+        }
+
+        String whitelistString = accessChestWhitelist.stream().map(ClanMember::getName).collect(Collectors.joining(","));
+        executors.async().update("UPDATE clanRegions SET accessChestsWhitelist = ? WHERE clan = ?", whitelistString, clan.getId());
+    }
+
+    @Override
+    public void setAccessBlocksSilently(boolean can, ClanMember forMember) {
+        if (accessBlocksWhitelist.contains(forMember) == can) {
+            return;
+        }
+
+        if (can) {
+            accessBlocksWhitelist.add(forMember);
+        } else {
+            accessBlocksWhitelist.remove(forMember);
+        }
+
+        String whitelistString = accessBlocksWhitelist.stream().map(ClanMember::getName).collect(Collectors.joining(","));
+        executors.async().update("UPDATE clanRegions SET accessBlocksWhitelist = ? WHERE clan = ?", whitelistString, clan.getId());
+    }
+
+    @Override
     public void giveItem(ClanMember member) {
         if (isRegionExists()) {
             member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_EXISTS).send(player));

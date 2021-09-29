@@ -6,6 +6,7 @@ import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
+import me.luckyzz.arbuzikclans.clan.member.rank.NotUsedClanRank;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -17,14 +18,14 @@ class ClanRankImpl extends NotUsedClanRankImpl implements ClanRank {
 
     private Clan clan;
 
-    ClanRankImpl(QueryExecutors executors, MessageConfig<Messages> messageConfig, ClanRank rank, String prefix) {
-        super(rank.getIndex(), prefix, rank.getPossibilities(), rank.getRole());
+    ClanRankImpl(QueryExecutors executors, MessageConfig<Messages> messageConfig, NotUsedClanRank rank, String prefix) {
+        super(messageConfig, executors, rank.getIndex(), prefix, rank.getPossibilities(), rank.getRole());
         this.executors = executors;
         this.messageConfig = messageConfig;
     }
 
     @Override
-    public ClanRank toUsing(Clan clan) {
+    public ClanRank toUsing() {
         throw new UnsupportedOperationException();
     }
 

@@ -16,12 +16,6 @@ public class MemberUpgradeData extends UpgradeDataImpl {
         this.amount = amount;
     }
 
-    @Override
-    public Message getClanMessage(ClanMember member) {
-        return super.getClanMessage(member).toAdaptive()
-                ;
-    }
-
     public int getLevel() {
         return level;
     }

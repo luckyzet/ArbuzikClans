@@ -26,10 +26,10 @@ class ClanMemberImpl implements ClanMember {
     private final String name;
     private Clan clan;
     private ClanRank rank;
-    private List<MemberQuest> quests;
+    private Collection<MemberQuest> quests;
     private int questsCompleted;
 
-    ClanMemberImpl(Plugin plugin, QueryExecutors executors, MessageConfig<Messages> messageConfig, String name, ClanRank rank, List<MemberQuest> quests, int questsCompleted) {
+    ClanMemberImpl(Plugin plugin, QueryExecutors executors, MessageConfig<Messages> messageConfig, String name, ClanRank rank, Collection<MemberQuest> quests, int questsCompleted) {
         this.plugin = plugin;
         this.executors = executors;
         this.messageConfig = messageConfig;

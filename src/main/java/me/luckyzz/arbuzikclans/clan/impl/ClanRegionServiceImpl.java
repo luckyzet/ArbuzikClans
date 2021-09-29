@@ -20,6 +20,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +40,67 @@ public class ClanRegionServiceImpl extends ExtendedListener implements ClanRegio
         this.clanService = clanService;
 
         ClanRegionImpl.setTagKey(plugin);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemStack = event.getItem();
+        if(itemStack == null || itemStack.getType() != Material.WOODEN_AXE) {
+            return;
+        }
+        Block block = event.getClickedBlock();
+        if(block == null) {
+            return;
+        }
+        Location location = block.getLocation();
+
+        clanService.getAllClans().forEach(clan -> {
+            ClanRegion region = clan.getRegion();
+            if (region.isRegionExists() && region.isInRegion(location)) {
+                event.setCancelled(true);
+                messageConfig.getMessage(Messages.NOT_ACCESS).send(player);
+            }
+        });
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onCommandExpand(PlayerCommandPreprocessEvent event) {
+        String message = event.getMessage().replaceFirst("/", "");
+
+        String[] split = message.split(" ");
+
+        if(split.length != 3) {
+            return;
+        }
+
+        if(split[0].equalsIgnoreCase("expand") && (!split[2].equalsIgnoreCase("vert") && !split[2].equalsIgnoreCase("up") && !split[2].equalsIgnoreCase("down"))) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onCommand(PlayerCommandPreprocessEvent event) {
+        String message = event.getMessage().replaceFirst("/", "");
+
+        if(!message.equalsIgnoreCase("pos1") && !message.equalsIgnoreCase("pos2")) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        ItemStack itemStack = event.getPlayer().getInventory().getItemInMainHand();
+        if(itemStack.getType() != Material.WOODEN_AXE) {
+            return;
+        }
+        Location location = player.getLocation();
+
+        clanService.getAllClans().forEach(clan -> {
+            ClanRegion region = clan.getRegion();
+            if (region.isRegionExists() && region.isInRegion(location)) {
+                event.setCancelled(true);
+                messageConfig.getMessage(Messages.NOT_ACCESS).send(player);
+            }
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

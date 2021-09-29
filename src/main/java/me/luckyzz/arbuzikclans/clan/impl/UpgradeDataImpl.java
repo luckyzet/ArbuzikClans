@@ -16,7 +16,9 @@ public class UpgradeDataImpl implements UpgradeData {
 
     @Override
     public Message getClanMessage(ClanMember member) {
-        return clanMessage;
+        return clanMessage.toAdaptive()
+                .placeholder("%rank%", member.getRank().getPrefix())
+                .placeholder("%name%", member.getName());
     }
 
     @Override

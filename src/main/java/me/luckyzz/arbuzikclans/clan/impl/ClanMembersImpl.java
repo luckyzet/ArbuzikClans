@@ -4,11 +4,13 @@ import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.ClanService;
+import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankRole;
+import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
 import me.luckyzz.arbuzikclans.config.ClanConfig;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.config.Settings;
@@ -59,6 +61,11 @@ class ClanMembersImpl implements ClanMembers {
     @Override
     public ClanMember getMember(String name) {
         return memberMap.get(name);
+    }
+
+    @Override
+    public void addMemberSilently(Player player, RankRole role) {
+
     }
 
     @Override
@@ -117,6 +124,14 @@ class ClanMembersImpl implements ClanMembers {
         }
         memberMap.remove(member.getName());
         executors.async().update("DELETE FROM clanMembers WHERE name = ?", member.getName());
+        executors.async().update("DELETE FROM clanQuests WHERE name = ?", member.getName());
+
+        Clan clan = member.getClan();
+        ClanChat chat = clan.getChat();
+        ClanRegion region = clan.getRegion();
+        region.setAccessChestSilently(false, member);
+        region.setAccessBlocksSilently(false, member);
+        chat.setMutedSilently(member, false);
 
         clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_MEMBER_KICKED)
                 .placeholder("%rank%", whoRemove.getRank().getPrefix())

@@ -6,7 +6,7 @@ import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 public interface ClanRank extends NotUsedClanRank {
 
     @Override
-    default ClanRank toUsing(Clan clan) {
+    default ClanRank toUsing() {
         throw new UnsupportedOperationException();
     }
 

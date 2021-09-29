@@ -121,4 +121,16 @@ class ClanChatImpl implements ClanChat {
         String mutedString = this.muted.stream().map(ClanMember::getName).collect(Collectors.joining(","));
         executors.async().update("UPDATE clanChats SET muted = ? WHERE clan = ?", mutedString, clan.getId());
     }
+
+    @Override
+    public void setMutedSilently(ClanMember muted, boolean isMuted) {
+        if (isMuted) {
+            this.muted.add(muted);
+        } else {
+            this.muted.remove(muted);
+        }
+
+        String mutedString = this.muted.stream().map(ClanMember::getName).collect(Collectors.joining(","));
+        executors.async().update("UPDATE clanChats SET muted = ? WHERE clan = ?", mutedString, clan.getId());
+    }
 }

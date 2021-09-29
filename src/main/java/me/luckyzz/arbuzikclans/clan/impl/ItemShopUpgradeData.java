@@ -24,12 +24,6 @@ public class ItemShopUpgradeData extends UpgradeDataImpl {
         this.dayOfWeeks = dayOfWeeks;
     }
 
-    @Override
-    public Message getClanMessage(ClanMember member) {
-        return super.getClanMessage(member).toAdaptive()
-                ;
-    }
-
     public ItemStack getItemStack() {
         return itemStack;
     }
