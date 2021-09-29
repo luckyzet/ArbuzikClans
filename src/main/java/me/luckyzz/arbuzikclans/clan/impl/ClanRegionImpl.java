@@ -74,6 +74,10 @@ class ClanRegionImpl implements ClanRegion {
     }
 
     private void calculateCuboid() {
+        if(center == null) {
+            return;
+        }
+
         World world = center.getWorld();
         int size = config.getInt(Settings.REGION_SIZE);
 

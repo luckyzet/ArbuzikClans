@@ -91,7 +91,9 @@ public enum Messages implements MessagePath {
     CLAN_INVITE_FULL("clan.invite.full", "&7[&cКлан&7] &cВы не можете пригласить этого игрока, т.к. клан переполнен!"),
     CLAN_INVITE_ACCEPT_FULL_EXECUTOR("clan.invite.accept.full.executor", "&7[&cКлан&7] &cВы не можете вступить в клан, т.к. клан переполнен!"),
     CLAN_INVITE_ACCEPT_FULL_TARGET("clan.invite.accept.full.executor", "&7[&cКлан&7] &cИгрок %name% не может вступить в клан, т.к. клан переполнен!"),
-    CLAN_UPGRADE_CANNOT_APPLY("clan.upgrade.cannotApply", "&cВы не можете применить это обновление к клану!");
+    CLAN_UPGRADE_CANNOT_APPLY("clan.upgrade.cannotApply", "&cВы не можете применить это обновление к клану!"),
+    NAME_LENGTH("name.length", "&cДопустимая длина от 4 до 12 символов!"),
+    NAME_SPACE("name.space", "&cВы не можете использовать проблеы в названии!");
 
     private final String path, defaultValue;
 

@@ -37,8 +37,10 @@ class MemberDayQuestsQuestsImpl implements MemberDayQuests.Quests {
     public List<MemberDayQuest> generateRandom(int count) {
         List<MemberDayQuest> selected = new ArrayList<>();
 
+        List<MemberDayQuest> quests = new ArrayList<>(this.quests);
+
         for (int i = 0; i < count; ) {
-            MemberDayQuest quest = quests.get(ThreadLocalRandom.current().nextInt(0, quests.size()));
+            MemberDayQuest quest = quests.remove(ThreadLocalRandom.current().nextInt(0, quests.size()));
             if (selected.contains(quest)) {
                 continue;
             }

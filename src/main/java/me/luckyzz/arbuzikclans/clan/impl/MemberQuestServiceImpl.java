@@ -25,8 +25,8 @@ public class MemberQuestServiceImpl implements MemberQuestService {
 
     private final Set<Scheduler> schedulers = new HashSet<>();
 
-    public MemberQuestServiceImpl(Plugin plugin, MessageConfig<Messages> messageConfig, ClanService clanService, MemberDayQuestsService questsService) {
-        schedulers.add(new QuestUpdateTask(plugin, messageConfig, questsService, clanService));
+    public MemberQuestServiceImpl(Plugin plugin, ClanService clanService, MemberDayQuestsService questsService) {
+        schedulers.add(new QuestUpdateTask(plugin, questsService, clanService));
 
         QuickEventListener.newListener().event(EntityDeathEvent.class, event -> {
             LivingEntity entity = event.getEntity();
@@ -70,13 +70,11 @@ public class MemberQuestServiceImpl implements MemberQuestService {
 
     private static class QuestUpdateTask extends Scheduler {
 
-        private final MessageConfig<Messages> messageConfig;
         private final MemberDayQuestsService questsService;
         private final ClanService clanService;
 
-        private QuestUpdateTask(Plugin plugin, MessageConfig<Messages> messageConfig, MemberDayQuestsService questsService, ClanService clanService) {
+        private QuestUpdateTask(Plugin plugin, MemberDayQuestsService questsService, ClanService clanService) {
             super(plugin);
-            this.messageConfig = messageConfig;
             this.questsService = questsService;
             this.clanService = clanService;
             runTaskTimerAsynchronously(SchedulerTicks.SECOND);
@@ -89,11 +87,7 @@ public class MemberQuestServiceImpl implements MemberQuestService {
                 return;
             }
 
-            clanService.getAllClans().forEach(clan -> clan.getMembers().getAllMembers().forEach(member -> {
-                member.changeQuests(questsService.getQuests(member).generateRandom(member));
-
-                member.apply(player -> messageConfig.getMessage(Messages.CLAN_QUESTS_UPDATED).send(player));
-            }));
+            clanService.getAllClans().forEach(clan -> clan.getMembers().getAllMembers().forEach(member -> member.changeQuests(questsService.getQuests(member).generateRandom(member))));
         }
     }
 }

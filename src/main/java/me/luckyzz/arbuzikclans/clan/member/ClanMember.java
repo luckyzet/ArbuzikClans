@@ -41,6 +41,8 @@ public interface ClanMember {
 
     void changeQuests(Collection<MemberQuest> quests);
 
+    void changeQuestsSilently(Collection<MemberQuest> quests);
+
     int getQuestsCompleted();
 
     void changeQuestsCompleted(int amount);

@@ -64,16 +64,4 @@ class ClanUpgradesImpl implements ClanUpgrades {
         upgrades.remove(upgrade);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ClanUpgradesImpl that = (ClanUpgradesImpl) o;
-        return new EqualsBuilder().append(messageConfig, that.messageConfig).append(clan, that.clan).append(upgrades, that.upgrades).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(messageConfig).append(clan).append(upgrades).toHashCode();
-    }
 }

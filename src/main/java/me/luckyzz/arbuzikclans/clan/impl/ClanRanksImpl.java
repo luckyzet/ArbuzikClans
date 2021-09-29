@@ -24,6 +24,10 @@ class ClanRanksImpl implements ClanRanks {
     void addRank(ClanRank rank) {
         ranks.put(rank.getIndex(), rank);
 
+        if(rank instanceof ClanRankImpl) {
+            ((ClanRankImpl) rank).setClan(clan);
+        }
+
         executors.async().update("INSERT INTO clanRanks VALUES (?, ?, ?)", rank.getClan().getId(), rank.getIndex(), rank.getPrefix());
     }
 
@@ -34,6 +38,13 @@ class ClanRanksImpl implements ClanRanks {
 
     void setClan(Clan clan) {
         this.clan = clan;
+
+        ranks.values().forEach(rank -> {
+            if(rank instanceof ClanRankImpl) {
+                ClanRankImpl clanRank = (ClanRankImpl) rank;
+                clanRank.setClan(clan);
+            }
+        });
     }
 
     @Override

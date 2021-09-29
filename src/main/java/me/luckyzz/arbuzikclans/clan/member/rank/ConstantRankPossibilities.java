@@ -6,7 +6,7 @@ public final class ConstantRankPossibilities {
         throw new UnsupportedOperationException();
     }
 
-    public static final RankPossibilities OWNER = new RankPossibilities();
+    public static final RankPossibilities OWNER = new RankPossibilities(RankPossibility.ALL);
 
     public static final RankPossibilities VICE = new RankPossibilities();
 

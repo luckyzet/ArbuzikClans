@@ -70,11 +70,11 @@ public class ClanRegionServiceImpl extends ExtendedListener implements ClanRegio
 
         String[] split = message.split(" ");
 
-        if(split.length != 3) {
+        if(split.length == 0) {
             return;
         }
 
-        if(split[0].equalsIgnoreCase("expand") && (!split[2].equalsIgnoreCase("vert") && !split[2].equalsIgnoreCase("up") && !split[2].equalsIgnoreCase("down"))) {
+        if(split[0].equalsIgnoreCase("/expand") && (split.length >= 3 && !split[2].equalsIgnoreCase("up") && !split[2].equalsIgnoreCase("down"))) {
             event.setCancelled(true);
         }
     }
@@ -83,15 +83,11 @@ public class ClanRegionServiceImpl extends ExtendedListener implements ClanRegio
     private void onCommand(PlayerCommandPreprocessEvent event) {
         String message = event.getMessage().replaceFirst("/", "");
 
-        if(!message.equalsIgnoreCase("pos1") && !message.equalsIgnoreCase("pos2")) {
+        if(!message.equalsIgnoreCase("/pos1") && !message.equalsIgnoreCase("/pos2")) {
             return;
         }
 
         Player player = event.getPlayer();
-        ItemStack itemStack = event.getPlayer().getInventory().getItemInMainHand();
-        if(itemStack.getType() != Material.WOODEN_AXE) {
-            return;
-        }
         Location location = player.getLocation();
 
         clanService.getAllClans().forEach(clan -> {

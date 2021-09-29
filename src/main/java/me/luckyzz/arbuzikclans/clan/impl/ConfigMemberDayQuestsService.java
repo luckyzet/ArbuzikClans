@@ -1,11 +1,14 @@
 package me.luckyzz.arbuzikclans.clan.impl;
 
+import me.luckkyyz.luckapi.config.MessageConfig;
+import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuests;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
 import me.luckyzz.arbuzikclans.clan.member.quest.QuestComplexity;
 import me.luckyzz.arbuzikclans.clan.member.quest.QuestType;
 import me.luckyzz.arbuzikclans.config.ClanConfig;
+import me.luckyzz.arbuzikclans.config.Messages;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -17,11 +20,15 @@ import java.util.Map;
 public class ConfigMemberDayQuestsService implements MemberDayQuestsService {
 
     private final ClanConfig config;
+    private final MessageConfig<Messages> messageConfig;
+    private final QueryExecutors executors;
 
     private final Map<QuestComplexity, MemberDayQuests> questsMap = new HashMap<>();
 
-    public ConfigMemberDayQuestsService(ClanConfig config) {
+    public ConfigMemberDayQuestsService(ClanConfig config, MessageConfig<Messages> messageConfig, QueryExecutors executors) {
         this.config = config;
+        this.messageConfig = messageConfig;
+        this.executors = executors;
         reload();
     }
 
@@ -44,8 +51,12 @@ public class ConfigMemberDayQuestsService implements MemberDayQuestsService {
 
                 MemberDayQuests memberDayQuests = new MemberDayQuestsImpl(complexity, minCount, maxCount, questsMap);
 
-                section.getKeys(false).forEach(sectionName -> {
-                    ConfigurationSection current = section.getConfigurationSection(sectionName);
+                ConfigurationSection questSection = section.getConfigurationSection("quests");
+                if(questSection == null) {
+                    return;
+                }
+                questSection.getKeys(false).forEach(sectionName -> {
+                    ConfigurationSection current = questSection.getConfigurationSection(sectionName);
                     if (current == null) {
                         return;
                     }
@@ -68,12 +79,12 @@ public class ConfigMemberDayQuestsService implements MemberDayQuestsService {
                     int maxCountQuest = current.getInt("maxCount");
                     if (type == QuestType.KILL) {
                         EntityType target = EntityType.valueOf(targetString);
-                        quests.addQuest(new MemberDayQuestImpl(type, target, minCountQuest, maxCountQuest));
+                        quests.addQuest(new MemberDayQuestImpl(messageConfig, executors, type, target, minCountQuest, maxCountQuest));
                         return;
                     }
                     if (type == QuestType.BREAK_BLOCKS) {
                         Material target = Material.getMaterial(targetString);
-                        quests.addQuest(new MemberDayQuestImpl(type, target, minCountQuest, maxCountQuest));
+                        quests.addQuest(new MemberDayQuestImpl(messageConfig, executors, type, target, minCountQuest, maxCountQuest));
                     }
                 });
 

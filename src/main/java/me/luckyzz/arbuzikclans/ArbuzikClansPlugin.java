@@ -61,15 +61,17 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         clanDatabase = DatabaseSerializers.yaml().deserialize(config.getSection("database"));
         QueryExecutors clanExecutors = new HikariQueryExecutors(this, clanDatabase);
 
-        memberDayQuestsService = new ConfigMemberDayQuestsService(config);
+        memberDayQuestsService = new ConfigMemberDayQuestsService(config, messageConfig, clanExecutors);
 
         clanUpgradeService = new ConfigClanUpgradeService(config, clanExecutors);
         clanRankService = new ConfigClanRankService(config, messageConfig, clanExecutors);
         clanService = new ClanServiceImpl(this, config, messageConfig, economyProvider, clanRankService, memberDayQuestsService, clanUpgradeService, clanExecutors);
 
-        memberQuestService = new MemberQuestServiceImpl(this, messageConfig, clanService, memberDayQuestsService);
+        memberQuestService = new MemberQuestServiceImpl(this, clanService, memberDayQuestsService);
         clanInviteService = new ClanInviteServiceImpl(this, clanService, config, messageConfig);
         clanRegionService = new ClanRegionServiceImpl(this, messageConfig, clanService);
+
+        new ClanCommand(messageConfig, clanService);
     }
 
     @Override

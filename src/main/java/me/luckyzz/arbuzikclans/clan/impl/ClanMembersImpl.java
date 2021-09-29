@@ -8,6 +8,7 @@ import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
+import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankRole;
 import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
@@ -64,8 +65,21 @@ class ClanMembersImpl implements ClanMembers {
     }
 
     @Override
-    public void addMemberSilently(Player player, RankRole role) {
+    public ClanMember addMemberSilently(Player player, RankRole role) {
+        ClanRank rank = clan.getRanks().getRank(role);
 
+        ClanMemberImpl newMember = new ClanMemberImpl(plugin, executors, messageConfig, player.getName(),
+                rank,
+                new ArrayList<>(),
+                0);
+        newMember.setClan(clan);
+        newMember.changeQuestsSilently(questsService.getQuests(newMember).generateRandom(newMember));
+
+        memberMap.put(newMember.getName(), newMember);
+        executors.async().update("INSERT INTO clanMembers VALUES (?, ?, ?, ?)", newMember.getName(), newMember.getClan().getId(),
+                newMember.getRank().getIndex(), newMember.getQuestsCompleted());
+
+        return newMember;
     }
 
     @Override
@@ -85,16 +99,8 @@ class ClanMembersImpl implements ClanMembers {
             return;
         }
 
-        ClanMemberImpl newMember = new ClanMemberImpl(plugin, executors, messageConfig, player.getName(),
-                clan.getRanks().getRank(RankRole.DEFAULT),
-                new ArrayList<>(),
-                0);
-        newMember.setClan(clan);
-        newMember.changeQuests(questsService.getQuests(newMember).generateRandom(newMember));
-        memberMap.put(newMember.getName(), newMember);
-
-        executors.async().update("INSERT INTO clanMembers VALUES (?, ?, ?, ?)", newMember.getName(), newMember.getClan().getId(),
-                newMember.getRank().getIndex(), newMember.getQuestsCompleted());
+        addMemberSilently(player, RankRole.DEFAULT);
+        ClanMember newMember = memberMap.get(player.getName());
         clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_MEMBER_ADDED)
                 .placeholder("%rank%", member.getRank().getPrefix())
                 .placeholder("%name%", member.getName())

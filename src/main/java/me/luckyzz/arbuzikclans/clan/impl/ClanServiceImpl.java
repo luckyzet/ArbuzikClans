@@ -20,6 +20,8 @@ import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRankService;
 import me.luckyzz.arbuzikclans.clan.member.rank.NotUsedClanRank;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankRole;
+import me.luckyzz.arbuzikclans.clan.name.ConfigFormatNameCheck;
+import me.luckyzz.arbuzikclans.clan.name.FormatNameCheck;
 import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrade;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgradeService;
@@ -48,6 +50,8 @@ public class ClanServiceImpl implements ClanService {
     private final MemberDayQuestsService memberDayQuestsService;
     private final ClanUpgradeService upgradeService;
 
+    private final FormatNameCheck formatNameCheck;
+
     private final QueryExecutors executors;
     private final Set<Clan> clans = new HashSet<>();
 
@@ -60,10 +64,13 @@ public class ClanServiceImpl implements ClanService {
         this.memberDayQuestsService = memberDayQuestsService;
         this.upgradeService = upgradeService;
         this.executors = executors;
+
+        formatNameCheck = new ConfigFormatNameCheck(config, messageConfig);
+
         reload();
 
         if (true) {
-            executors.sync().update("DROP TABLE clans, clanMembers, clanRanks, clanQuests;");
+            executors.sync().update("DROP TABLE clans, clanMembers, clanRanks, clanQuests, clanUpgrades, clanRegions, clanChats;");
         }
 
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clans` (" +
@@ -99,7 +106,7 @@ public class ClanServiceImpl implements ClanService {
                 ")");
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanQuests` (" +
                 "`name` VARCHAR(64) NOT NULL, " +
-                "`target` VARCHAR(16) NOT NULL, " +
+                "`target` VARCHAR(64) NOT NULL, " +
                 "`count` INT NOT NULL, " +
                 "`needCount` INT NOT NULL" +
                 ")");
@@ -279,59 +286,57 @@ public class ClanServiceImpl implements ClanService {
             return;
         }
 
-        if (!config.getBoolean(Settings.CLAN_NAME_COLORS) && name.contains(ColorUtils.ALTERNATIVE_CODE_STRING)) {
-            messageConfig.getMessage(Messages.CLAN_CREATE_NOT_COLORS).send(player);
+        if(!formatNameCheck.checkName(player, name)) {
             return;
         }
+
         int needMoney = config.getInt(Settings.CLAN_CREATE_MONEY);
         if (needMoney > 0) {
             EconomicUser economicUser = economyProvider.getUser(player);
             if (!economicUser.hasBalance(needMoney)) {
-                messageConfig.getMessage(Messages.NOT_ENOUGH_MONEY).send(player);
+                messageConfig.getAdaptiveMessage(Messages.NOT_ENOUGH_MONEY)
+                        .placeholder("%balance%", (int) economicUser.getBalance())
+                        .placeholder("%need_balance%", needMoney)
+                        .placeholder("%need%", needMoney - (int) economicUser.getBalance())
+                        .send(player);
                 return;
             }
             economicUser.changeBalance(-needMoney);
         }
 
         name = ColorUtils.color(name);
+
         int id = getClanId() + 1;
         LocalDate dateCreated = LocalDate.now(DateZone.MOSCOW.getIdentifier());
         int money = 0, coins = 0;
 
         ClanMembersImpl members = new ClanMembersImpl(plugin, this, config, executors, messageConfig, memberDayQuestsService, new HashMap<>());
-        members.addMemberSilently(player, RankRole.OWNER);
 
         ClanUpgradesImpl upgrades = new ClanUpgradesImpl(messageConfig, new HashSet<>());
 
         ClanRanksImpl ranks = new ClanRanksImpl(executors, new HashMap<>());
-        rankService.getRanks().forEach(rank -> ranks.addRank(rank.toUsing()));
 
         ClanRegionImpl region = new ClanRegionImpl(config, messageConfig, executors, null, false, false, new HashSet<>(), new HashSet<>());
         ClanChatImpl chat = new ClanChatImpl(messageConfig, executors, true, new HashSet<>());
 
         Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat);
 
-        members.setClan(clan);
-        members.getAllMembers().forEach(member -> {
-            if(member instanceof ClanMemberImpl) {
-                ClanMemberImpl clanMember = (ClanMemberImpl) member;
-                clanMember.setClan(clan);
-            }
-        });
-
         upgrades.setClan(clan);
         ranks.setClan(clan);
-        ranks.getRanks().forEach(rank -> {
-            if(rank instanceof ClanRankImpl) {
-                ClanRankImpl clanRank = (ClanRankImpl) rank;
-                clanRank.setClan(clan);
-            }
-        });
+        rankService.getRanks().forEach(rank -> ranks.addRank(rank.toUsing()));
+
+        members.setClan(clan);
+        ClanMember member = members.addMemberSilently(player, RankRole.OWNER);
 
         region.setClan(clan);
         chat.setClan(clan);
 
+        executors.async().update("INSERT INTO clans VALUES (?, ?, ?, ?, ?)", clan.getId(), clan.getDateCreated(FormatDate.DATE), clan.getName(), clan.getMoney(), clan.getCoins());
+
         clans.add(clan);
+
+        clan.getRegion().giveItem(member);
+        messageConfig.getAdaptiveMessage(Messages.CLAN_CREATE_SUCCESS).placeholder("%name%", clan.getName()).send(player);
     }
 
     @Override

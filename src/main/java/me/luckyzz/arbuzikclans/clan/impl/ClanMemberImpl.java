@@ -78,6 +78,13 @@ class ClanMemberImpl implements ClanMember {
 
     @Override
     public void changeQuests(Collection<MemberQuest> quests) {
+        changeQuestsSilently(quests);
+
+        apply(player -> messageConfig.getMessage(Messages.CLAN_QUESTS_UPDATED).send(player));
+    }
+
+    @Override
+    public void changeQuestsSilently(Collection<MemberQuest> quests) {
         this.quests = new ArrayList<>(quests);
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
