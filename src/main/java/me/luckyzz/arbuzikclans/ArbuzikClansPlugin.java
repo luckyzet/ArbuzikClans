@@ -1,6 +1,8 @@
 package me.luckyzz.arbuzikclans;
 
 import me.luckkyyz.luckapi.LuckApi;
+import me.luckkyyz.luckapi.chat.input.ChatInputMessageService;
+import me.luckkyyz.luckapi.chat.input.LuckChatInputMessageService;
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.HikariDatabase;
 import me.luckkyyz.luckapi.database.HikariQueryExecutors;
@@ -15,9 +17,12 @@ import me.luckyzz.arbuzikclans.clan.member.invite.ClanInviteService;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuestService;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRankService;
+import me.luckyzz.arbuzikclans.clan.menu.ClanMenuService;
+import me.luckyzz.arbuzikclans.clan.menu.ClanMenuServiceImpl;
 import me.luckyzz.arbuzikclans.clan.region.ClanRegionService;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgradeService;
 import me.luckyzz.arbuzikclans.config.ClanConfig;
+import me.luckyzz.arbuzikclans.config.MenuText;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -49,13 +54,17 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
     private MemberDayQuestsService memberDayQuestsService;
     private MemberQuestService memberQuestService;
 
+    private ClanMenuService clanMenuService;
+
     @Override
     public void onEnable() {
         luckApi = LuckApi.bootstrapWith(this);
         luckApi.registerService(MenuService.class, LuckMenuService::new);
+        ChatInputMessageService inputMessageService = luckApi.registerService(ChatInputMessageService.class, LuckChatInputMessageService::new);
 
         ClanConfig config = new ClanConfig(this);
         MessageConfig<Messages> messageConfig = new MessageConfig<>(this, Messages.values());
+        MessageConfig<MenuText> menuText = new MessageConfig<>(this, "menuText", MenuText.values());
         EconomyProvider economyProvider = EconomyProvider.openProvider();
 
         clanDatabase = DatabaseSerializers.yaml().deserialize(config.getSection("database"));
@@ -71,7 +80,9 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         clanInviteService = new ClanInviteServiceImpl(this, clanService, config, messageConfig);
         clanRegionService = new ClanRegionServiceImpl(this, messageConfig, clanService);
 
-        new ClanCommand(messageConfig, clanService);
+        clanMenuService = new ClanMenuServiceImpl(messageConfig, menuText, inputMessageService);
+
+        new ClanCommand(messageConfig, clanService, clanMenuService, clanInviteService);
     }
 
     @Override
@@ -91,16 +102,19 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         if(clanInviteService != null) {
             clanInviteService.cancel();
         }
-        if(clanRegionService != null) {
+        if (clanRegionService != null) {
             clanRegionService.cancel();
         }
-        if(memberDayQuestsService != null) {
+        if (memberDayQuestsService != null) {
             memberDayQuestsService.cancel();
         }
-        if(memberQuestService != null) {
+        if (memberQuestService != null) {
             memberQuestService.cancel();
         }
-        if(clanDatabase != null) {
+        if (clanMenuService != null) {
+            clanMenuService.cancel();
+        }
+        if (clanDatabase != null) {
             clanDatabase.close();
         }
     }

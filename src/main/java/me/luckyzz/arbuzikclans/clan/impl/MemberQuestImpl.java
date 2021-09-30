@@ -14,23 +14,26 @@ class MemberQuestImpl implements MemberQuest {
 
     private final QueryExecutors executors;
     private final MessageConfig<Messages> messageConfig;
+    private final String display;
     private final Object target;
     private final int needCount;
     private ClanMember member;
     private int count;
 
-    MemberQuestImpl(QueryExecutors executors, MessageConfig<Messages> messageConfig, Object target, int needCount, int count) {
+    MemberQuestImpl(QueryExecutors executors, MessageConfig<Messages> messageConfig, String display, Object target, int needCount, int count) {
         this.executors = executors;
         this.messageConfig = messageConfig;
+        this.display = display;
         this.target = target;
         this.needCount = needCount;
         this.count = count;
     }
 
-    MemberQuestImpl(ClanMember member, QueryExecutors executors, MessageConfig<Messages> messageConfig, Object target, int needCount, int count) {
+    MemberQuestImpl(ClanMember member, QueryExecutors executors, MessageConfig<Messages> messageConfig, String display, Object target, int needCount, int count) {
         this.member = member;
         this.executors = executors;
         this.messageConfig = messageConfig;
+        this.display = display;
         this.target = target;
         this.needCount = needCount;
         this.count = count;
@@ -45,6 +48,11 @@ class MemberQuestImpl implements MemberQuest {
     public String getTargetName() {
         return target instanceof EntityType ? "Entity " + ((EntityType) target).name() :
                 target instanceof Material ? "Block " + ((Material) target).name() : "null";
+    }
+
+    @Override
+    public String getDisplay() {
+        return display;
     }
 
     @Override
@@ -68,6 +76,10 @@ class MemberQuestImpl implements MemberQuest {
 
     @Override
     public void changeCount(int amount) {
+        if (isFinished()) {
+            return;
+        }
+
         this.count += amount;
 
         executors.async().update("UPDATE quests SET count = ? WHERE name = ?", this.count, member.getName());
@@ -75,6 +87,7 @@ class MemberQuestImpl implements MemberQuest {
         if (isFinished()) {
             member.apply(player -> messageConfig.getMessage(Messages.CLAN_QUESTS_FINISHED).send(player));
             member.addQuestCompleted();
+            member.getClan().changeCoinsQuest(1, member);
         } else {
             member.apply(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_QUESTS_COUNT_CHANGE)
                     .placeholder("%count%", this.count)
@@ -83,28 +96,4 @@ class MemberQuestImpl implements MemberQuest {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MemberQuestImpl that = (MemberQuestImpl) o;
-        return new EqualsBuilder()
-                .append(needCount, that.needCount)
-                .append(count, that.count)
-                .append(executors, that.executors)
-                .append(member, that.member)
-                .append(target, that.target)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(executors)
-                .append(member)
-                .append(target)
-                .append(needCount)
-                .append(count)
-                .toHashCode();
-    }
 }

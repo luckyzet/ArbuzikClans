@@ -57,6 +57,12 @@ class ClanMembersImpl implements ClanMembers {
 
     void setClan(Clan clan) {
         this.clan = clan;
+
+        memberMap.values().forEach(member -> {
+            if (member instanceof ClanMemberImpl) {
+                ((ClanMemberImpl) member).setClan(clan);
+            }
+        });
     }
 
     @Override
@@ -93,7 +99,7 @@ class ClanMembersImpl implements ClanMembers {
             member.apply(player1 -> messageConfig.getAdaptiveMessage(Messages.ALREADY_CLAN_OTHER).placeholder("%name%", player.getName()).send(player1));
             return;
         }
-        if (member.getClan().getMembers().getMaxMembers() >= member.getClan().getMembers().getAllMembers().size()) {
+        if (member.getClan().getMembers().getMaxMembers() <= member.getClan().getMembers().getAllMembers().size()) {
             messageConfig.getMessage(Messages.CLAN_INVITE_ACCEPT_FULL_EXECUTOR).send(player);
             member.apply(player1 -> messageConfig.getAdaptiveMessage(Messages.CLAN_INVITE_ACCEPT_FULL_TARGET).placeholder("%name%", player.getName()).send(player1));
             return;
@@ -124,6 +130,10 @@ class ClanMembersImpl implements ClanMembers {
 
     @Override
     public void removeMember(ClanMember member, ClanMember whoRemove) {
+        if (member.getName().equals(whoRemove.getName())) {
+            whoRemove.apply(player1 -> messageConfig.getMessage(Messages.YOURSELF).send(player1));
+            return;
+        }
         if (!whoRemove.hasPossibility(RankPossibility.KICK_OTHER) || member.getRank().getRole() == RankRole.OWNER) {
             whoRemove.apply(player1 -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player1));
             return;

@@ -40,6 +40,10 @@ public class ClanInviteServiceImpl extends ExtendedListener implements ClanInvit
 
     @Override
     public void addInvite(Player player, ClanMember member) {
+        if (player.getName().equals(member.getName())) {
+            member.apply(player1 -> messageConfig.getMessage(Messages.YOURSELF).send(player1));
+            return;
+        }
         if (!member.hasPossibility(RankPossibility.INVITE)) {
             member.apply(player1 -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player1));
             return;
@@ -52,7 +56,7 @@ public class ClanInviteServiceImpl extends ExtendedListener implements ClanInvit
             member.apply(player1 -> messageConfig.getMessage(Messages.CLAN_INVITE_ALREADY).send(player1));
             return;
         }
-        if (member.getClan().getMembers().getMaxMembers() >= member.getClan().getMembers().getAllMembers().size()) {
+        if (member.getClan().getMembers().getMaxMembers() <= member.getClan().getMembers().getAllMembers().size()) {
             member.apply(player1 -> messageConfig.getMessage(Messages.CLAN_INVITE_FULL).send(player1));
             return;
         }
@@ -62,9 +66,9 @@ public class ClanInviteServiceImpl extends ExtendedListener implements ClanInvit
 
         invite.apply(player1 -> messageConfig.getAdaptiveMessage(Messages.CLAN_INVITE_SUCCESS_TARGET)
                 .placeholder("%clan%", invite.getClan().getName())
-                .placeholder("%name%", invite.getName()));
+                .placeholder("%name%", invite.getName()).send(player1));
         member.apply(player1 -> messageConfig.getAdaptiveMessage(Messages.CLAN_INVITE_SUCCESS_EXECUTOR)
-                .placeholder("%name%", member.getName()));
+                .placeholder("%name%", member.getName()).send(player1));
     }
 
     void removeInvite(ClanInvite invite) {

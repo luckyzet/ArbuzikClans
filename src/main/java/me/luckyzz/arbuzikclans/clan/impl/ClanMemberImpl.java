@@ -16,7 +16,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 class ClanMemberImpl implements ClanMember {
 
@@ -60,9 +59,13 @@ class ClanMemberImpl implements ClanMember {
 
     @Override
     public void changeRank(ClanRank rank, ClanMember member) {
+        if (name.equals(member.getName())) {
+            apply(player -> messageConfig.getMessage(Messages.YOURSELF).send(player));
+            return;
+        }
         RankRole role = rank.getRole();
         if (!member.hasPossibility(RankPossibility.RANK_GIVE) || (role.isSingle() && !clan.getMembers().getMembers(rank.getRole()).isEmpty())) {
-            apply(player -> messageConfig.getMessage(Messages.CLAN_RANK_CANNOT_GIVE).send(player));
+            member.apply(player -> messageConfig.getMessage(Messages.CLAN_RANK_CANNOT_GIVE).send(player));
             return;
         }
 
@@ -89,7 +92,7 @@ class ClanMemberImpl implements ClanMember {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             executors.sync().update("DELETE FROM clanQuests WHERE name = ?", name);
-            quests.forEach(quest -> executors.sync().update("INSERT INTO clanQuests VALUES (?, ?, ?, ?)", name, quest.getTargetName(), quest.getCount(), quest.getNeedCount()));
+            quests.forEach(quest -> executors.sync().update("INSERT INTO clanQuests VALUES (?, ?, ?, ?, ?)", name, quest.getDisplay(), quest.getTargetName(), quest.getCount(), quest.getNeedCount()));
         });
     }
 

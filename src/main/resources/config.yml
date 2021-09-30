@@ -1,6 +1,8 @@
 # Сумма, необходимая для создания клана
 clanCreateMoney: 100
 
+renameMoney: 100
+
 # Время, в течении которого можно принять запрос в клан в сек.
 clanInviteTime: 30
 
@@ -72,16 +74,19 @@ quests:
         target: ZOMBIE
         minCount: 1
         maxCount: 5
+        name: "Убить зомби %amount%"
       second:
         type: KILL
         target: ZOMBIE
         minCount: 3
         maxCount: 8
+        name: "Убить зомби %amount%"
       third:
         type: BREAK_BLOCKS
         target: DIAMOND_ORE
         minCount: 1
         maxCount: 5
+        name: "Сломать алмазы %amount%"
   normal:
     minCount: 1
     maxCount: 2
@@ -91,16 +96,19 @@ quests:
         target: ZOMBIE
         minCount: 3
         maxCount: 8
+        name: "Убить зомби %amount%"
       second:
         type: KILL
         target: ZOMBIE
         minCount: 5
         maxCount: 10
+        name: "Убить зомби %amount%"
       third:
         type: BREAK_BLOCKS
         target: DIAMOND_ORE
         minCount: 5
         maxCount: 15
+        name: "Сломать алмазы %amount%"
   high:
     minCount: 1
     maxCount: 2
@@ -110,16 +118,19 @@ quests:
         target: ZOMBIE
         minCount: 1
         maxCount: 3
+        name: "Убить зомби %amount%"
       second:
         type: KILL
         target: ZOMBIE
         minCount: 10
         maxCount: 21
+        name: "Убить зомби %amount%"
       third:
         type: BREAK_BLOCKS
         target: DIAMOND_ORE
         minCount: 5
         maxCount: 35
+        name: "Сломать алмазы %amount%"
 
 upgrades:
   1:

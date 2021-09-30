@@ -8,7 +8,8 @@ public enum Settings implements Path {
     CLAN_CREATE_MONEY("clanCreateMoney"),
     REGION_SIZE("region.size"),
     CLAN_INVITE_TIME("clanInviteTime"),
-    MAX_MEMBERS_DEFAULT("maxMembersDefault");
+    MAX_MEMBERS_DEFAULT("maxMembersDefault"),
+    RENAME_MONEY("renameMoney");
 
     private final String path;
 

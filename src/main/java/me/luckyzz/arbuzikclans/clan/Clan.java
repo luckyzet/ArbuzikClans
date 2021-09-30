@@ -39,6 +39,8 @@ public interface Clan {
 
     void changeCoinsSilently(int amount);
 
+    void changeCoinsQuest(int amount, ClanMember member);
+
     ClanRegion getRegion();
 
     ClanChat getChat();

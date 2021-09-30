@@ -22,7 +22,6 @@ import me.luckyzz.arbuzikclans.clan.member.rank.NotUsedClanRank;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankRole;
 import me.luckyzz.arbuzikclans.clan.name.ConfigFormatNameCheck;
 import me.luckyzz.arbuzikclans.clan.name.FormatNameCheck;
-import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrade;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgradeService;
 import me.luckyzz.arbuzikclans.config.ClanConfig;
@@ -67,9 +66,7 @@ public class ClanServiceImpl implements ClanService {
 
         formatNameCheck = new ConfigFormatNameCheck(config, messageConfig);
 
-        reload();
-
-        if (true) {
+        if (false) {
             executors.sync().update("DROP TABLE clans, clanMembers, clanRanks, clanQuests, clanUpgrades, clanRegions, clanChats;");
         }
 
@@ -106,6 +103,7 @@ public class ClanServiceImpl implements ClanService {
                 ")");
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanQuests` (" +
                 "`name` VARCHAR(64) NOT NULL, " +
+                "`display` VARCHAR(64) NOT NULL, " +
                 "`target` VARCHAR(64) NOT NULL, " +
                 "`count` INT NOT NULL, " +
                 "`needCount` INT NOT NULL" +
@@ -114,6 +112,8 @@ public class ClanServiceImpl implements ClanService {
                 "`clan` INT NOT NULL, " +
                 "`id` INT NOT NULL" +
                 ")");
+
+        reload();
     }
 
     @Override
@@ -126,17 +126,18 @@ public class ClanServiceImpl implements ClanService {
                 while (result.next()) {
                     String name = result.getString("name");
                     String targetString = result.getString("target");
+                    String display = result.getString("display");
                     int count = result.getInt("count");
                     int needCount = result.getInt("needCount");
 
                     if(targetString.split(" ")[0].equals("Entity")) {
                         EntityType entityType = EntityType.valueOf(targetString.split(" ")[1]);
-                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, entityType, count, needCount));
+                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, display, entityType, needCount, count));
                         continue;
                     }
                     if(targetString.split(" ")[0].equals("Block")) {
                         Material material = Material.valueOf(targetString.split(" ")[1]);
-                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, material, count, needCount));
+                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, display, material, needCount, count));
                     }
                 }
             });
@@ -202,17 +203,17 @@ public class ClanServiceImpl implements ClanService {
                             String accessChestsString = result.getString("accessChestsWhitelist");
                             String accessBlocksString = result.getString("accessBlocksWhitelist");
 
-                            Set<ClanMember> accessChestsWhitelist = Arrays.stream(accessChestsString.split(","))
+                            List<ClanMember> accessChestsWhitelist = Arrays.stream(accessChestsString.split(","))
                                     .map(memberMap::get)
-                                    .collect(Collectors.toSet());
-                            Set<ClanMember> accessBlocksWhitelist = Arrays.stream(accessBlocksString.split(","))
+                                    .collect(Collectors.toList());
+                            List<ClanMember> accessBlocksWhitelist = Arrays.stream(accessBlocksString.split(","))
                                     .map(memberMap::get)
-                                    .collect(Collectors.toSet());
+                                    .collect(Collectors.toList());
 
                             region.set(new ClanRegionImpl(config, messageConfig, executors, location, accessChests, accessBlocks, accessChestsWhitelist, accessBlocksWhitelist));
                             return;
                         }
-                        region.set(new ClanRegionImpl(config, messageConfig, executors, null, false, false, new HashSet<>(), new HashSet<>()));
+                        region.set(new ClanRegionImpl(config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>()));
                     }, id);
 
                     AtomicReference<ClanChatImpl> chat = new AtomicReference<>();
@@ -234,12 +235,18 @@ public class ClanServiceImpl implements ClanService {
 
                     ClanRegionImpl clanRegion = region.get();
                     ClanChatImpl clanChat = chat.get();
-                    Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, id, date, name, members, upgrades, ranks, money, coins, clanRegion, clanChat);
+                    Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, date, name, members, upgrades, ranks, money, coins, clanRegion, clanChat);
                     members.setClan(clan);
                     upgrades.setClan(clan);
                     ranks.setClan(clan);
                     clanRegion.setClan(clan);
                     clanChat.setClan(clan);
+
+                    members.getAllMembers().forEach(member -> member.getQuests().forEach(quest -> {
+                        if (quest instanceof MemberQuestImpl) {
+                            ((MemberQuestImpl) quest).setMember(member);
+                        }
+                    }));
 
                     clans.add(clan);
                 }
@@ -316,10 +323,10 @@ public class ClanServiceImpl implements ClanService {
 
         ClanRanksImpl ranks = new ClanRanksImpl(executors, new HashMap<>());
 
-        ClanRegionImpl region = new ClanRegionImpl(config, messageConfig, executors, null, false, false, new HashSet<>(), new HashSet<>());
+        ClanRegionImpl region = new ClanRegionImpl(config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>());
         ClanChatImpl chat = new ClanChatImpl(messageConfig, executors, true, new HashSet<>());
 
-        Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat);
+        Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat);
 
         upgrades.setClan(clan);
         ranks.setClan(clan);
@@ -332,6 +339,8 @@ public class ClanServiceImpl implements ClanService {
         chat.setClan(clan);
 
         executors.async().update("INSERT INTO clans VALUES (?, ?, ?, ?, ?)", clan.getId(), clan.getDateCreated(FormatDate.DATE), clan.getName(), clan.getMoney(), clan.getCoins());
+        executors.async().update("INSERT INTO clanRegions VALUES (?, ?, ?, ?, ?, ?)", clan.getId(), "null", false, false, "", "");
+        executors.async().update("INSERT INTO clanChats VALUES (?, ?, ?)", clan.getId(), true, "");
 
         clans.add(clan);
 

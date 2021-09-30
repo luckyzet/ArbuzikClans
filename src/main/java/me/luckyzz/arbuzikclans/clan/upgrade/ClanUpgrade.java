@@ -1,14 +1,13 @@
 package me.luckyzz.arbuzikclans.clan.upgrade;
 
+import me.luckkyyz.luckapi.api.Typable;
 import me.luckyzz.arbuzikclans.clan.Clan;
 
 import java.util.Collection;
 
-public interface ClanUpgrade {
+public interface ClanUpgrade extends Typable<UpgradeType> {
 
     int getIndex();
-
-    UpgradeType getType();
 
     <T extends UpgradeData> T getData();
 

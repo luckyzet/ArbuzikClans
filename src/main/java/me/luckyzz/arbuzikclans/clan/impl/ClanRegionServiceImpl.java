@@ -44,13 +44,17 @@ public class ClanRegionServiceImpl extends ExtendedListener implements ClanRegio
 
     @EventHandler(priority = EventPriority.LOWEST)
     private void onInteract(PlayerInteractEvent event) {
+        if (PermissionUtil.hasPermission(event.getPlayer(), Permissions.REGION_BYPASS)) {
+            return;
+        }
+
         Player player = event.getPlayer();
         ItemStack itemStack = event.getItem();
-        if(itemStack == null || itemStack.getType() != Material.WOODEN_AXE) {
+        if (itemStack == null || itemStack.getType() != Material.WOODEN_AXE) {
             return;
         }
         Block block = event.getClickedBlock();
-        if(block == null) {
+        if (block == null) {
             return;
         }
         Location location = block.getLocation();
@@ -66,24 +70,32 @@ public class ClanRegionServiceImpl extends ExtendedListener implements ClanRegio
 
     @EventHandler(priority = EventPriority.LOWEST)
     private void onCommandExpand(PlayerCommandPreprocessEvent event) {
+        if (PermissionUtil.hasPermission(event.getPlayer(), Permissions.REGION_BYPASS)) {
+            return;
+        }
+
         String message = event.getMessage().replaceFirst("/", "");
 
         String[] split = message.split(" ");
 
-        if(split.length == 0) {
+        if (split.length == 0) {
             return;
         }
 
-        if(split[0].equalsIgnoreCase("/expand") && (split.length >= 3 && !split[2].equalsIgnoreCase("up") && !split[2].equalsIgnoreCase("down"))) {
+        if (split[0].equalsIgnoreCase("/expand") && (split.length >= 3 && !split[2].equalsIgnoreCase("up") && !split[2].equalsIgnoreCase("down"))) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     private void onCommand(PlayerCommandPreprocessEvent event) {
+        if (PermissionUtil.hasPermission(event.getPlayer(), Permissions.REGION_BYPASS)) {
+            return;
+        }
+
         String message = event.getMessage().replaceFirst("/", "");
 
-        if(!message.equalsIgnoreCase("/pos1") && !message.equalsIgnoreCase("/pos2")) {
+        if (!message.equalsIgnoreCase("/pos1") && !message.equalsIgnoreCase("/pos2")) {
             return;
         }
 

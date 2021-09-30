@@ -9,9 +9,15 @@ public interface MemberQuest {
         return getTarget().equals(value);
     }
 
+    default QuestType getType() {
+        return getTargetName().startsWith("Block") ? QuestType.BREAK_BLOCKS : getTargetName().startsWith("Entity ") ? QuestType.KILL : null;
+    }
+
     Object getTarget();
 
     String getTargetName();
+
+    String getDisplay();
 
     default Clan getClan() {
         return getMember().getClan();

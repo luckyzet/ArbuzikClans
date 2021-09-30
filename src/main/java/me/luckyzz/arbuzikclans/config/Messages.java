@@ -25,6 +25,8 @@ public enum Messages implements MessagePath {
     ALREADY_CLAN("alreadyInClan", "&cВы уже состоите в клане!"),
     ALREADY_CLAN_OTHER("alreadyInClanOther", "&cИгрок %name% уже состоит в клане!"),
     NOT_CLAN("notClan", "&cВы не состоите в клане!"),
+    NOT_IN_CLAN("notInClan", "&cИгрок %name% не состоит в клане!"),
+    YOURSELF("yourself", "&cВы не можете выполнить это действие по отношению к себе!"),
     NOT_ACCESS("notAccess", "&cУ Вас недостаточно полномочий, чтобы сделать это!"),
     CLAN_CHAT_EMPTY("clan.chat.emptyMessage", "&cВы не можете отправить в чат пустое сообщение!"),
     CLAN_CHAT_FORMAT("clan.chat.format", "&7[&cК.Чат&7] &f%rank% %name%&7: &f%message%"),
@@ -67,6 +69,7 @@ public enum Messages implements MessagePath {
     CLAN_REGION_CREATE_SUCCESS_LOCAL("clan.region.create.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fсоздал регион клана!"),
     CLAN_REGION_EXISTS("clan.region.exists", "&cКлановый регион уже существует!"),
     CLAN_REGION_NOT_EXISTS("clan.region.notExists", "&cКлановый регион не существует!"),
+    CLAN_REGION_BREAK("clan.region.break", "&7[&cКлан&7] &c%rank% &c%name% &fубрал регион клана!"),
     CLAN_INVITE_ALREADY("clan.invite.already", "&cВы уже пригласили этого игрока!"),
     CLAN_INVITE_ALREADY_CLAN("clan.invite.alreadyClan", "&cЭтот игрок уже состоит в клане!"),
     CLAN_INVITE_ACCEPT_ALREADY_CLAN("clan.invite.accept.alreadyClan", "&cВы уже состоите в клане!"),
@@ -90,10 +93,19 @@ public enum Messages implements MessagePath {
     CLAN_MEMBER_KICKED("clan.member.kicked", "&7[&cКлан&7] &c%rank% &c%name% &fизгнал игрока &c%target_rank% &c%target_name%"),
     CLAN_INVITE_FULL("clan.invite.full", "&7[&cКлан&7] &cВы не можете пригласить этого игрока, т.к. клан переполнен!"),
     CLAN_INVITE_ACCEPT_FULL_EXECUTOR("clan.invite.accept.full.executor", "&7[&cКлан&7] &cВы не можете вступить в клан, т.к. клан переполнен!"),
-    CLAN_INVITE_ACCEPT_FULL_TARGET("clan.invite.accept.full.executor", "&7[&cКлан&7] &cИгрок %name% не может вступить в клан, т.к. клан переполнен!"),
+    CLAN_INVITE_ACCEPT_FULL_TARGET("clan.invite.accept.full.target", "&7[&cКлан&7] &cИгрок %name% не может вступить в клан, т.к. клан переполнен!"),
     CLAN_UPGRADE_CANNOT_APPLY("clan.upgrade.cannotApply", "&cВы не можете применить это обновление к клану!"),
     NAME_LENGTH("name.length", "&cДопустимая длина от 4 до 12 символов!"),
-    NAME_SPACE("name.space", "&cВы не можете использовать проблеы в названии!");
+    NAME_SPACE("name.space", "&cВы не можете использовать проблеы в названии!"),
+    CLAN_REGION_TELEPORT_SUCCESS("clan.region.teleport.success", "&fВы успешно телепортировались на клановую базу!"),
+    CLAN_REGION_TELEPORT_FAILED("clan.region.teleport.failed", "&cКлановой базы не существует, поэтому вы не можете телепортироваться!"),
+    CLAN_REGION_TELEPORT_FAILED_DANGEROUS("clan.region.teleport.failedDangerous", "&cВы не можете телепортироваться, т.к. на точке телепорта есть блоки, которые могут Вам навредить!"),
+    CLAN_REGION_USAGE("clan.region.usage", "&cИспользуй - /clan region blocks/chests [Никнейм]"),
+    CLAN_INVITE_USAGE("clan.invite.usage", "&cИспользуй - /clan invite [Никнейм]"),
+    NOT_ONLINE("notOnline", "&cЭтот игрок не онлайн!"),
+    NOT_INVITE("clan.invite.notInvite", "&cВас никто не приглашал в клан!"),
+    QUEST_COINS_GAVE("clan.quests.gaveCoins", "&7[&cКлан&7] &c%rank% &c%name% &fдобавил в козну &c%amount% коинов &fза счет выполнения квеста! (Всего &c%sum_amount% коинов&f)"),
+    CLAN_RENAME_USAGE("clan.rename.usage", "&cИспользуй - /clan rename [Название]");
 
     private final String path, defaultValue;
 

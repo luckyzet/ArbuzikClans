@@ -6,6 +6,8 @@ import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.util.List;
+
 public interface ClanRegion {
 
     Clan getClan();
@@ -30,6 +32,22 @@ public interface ClanRegion {
 
     default boolean isInRegion(Location location) {
         return isRegionExists() && getCuboid().contains(location);
+    }
+
+    boolean getAccessChest();
+
+    boolean getAccessBlocks();
+
+    List<ClanMember> getAccessChestWhitelist();
+
+    default boolean getAccessChestWhitelist(ClanMember member) {
+        return getAccessChestWhitelist().contains(member);
+    }
+
+    List<ClanMember> getAccessBlockWhitelist();
+
+    default boolean getAccessBlocksWhitelist(ClanMember member) {
+        return getAccessBlockWhitelist().contains(member);
     }
 
     boolean canAccessChest(ClanMember member);

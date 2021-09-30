@@ -1,18 +1,19 @@
 package me.luckyzz.arbuzikclans.clan.member.quest;
 
+import me.luckkyyz.luckapi.api.Typable;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public interface MemberDayQuest {
-
-    QuestType getType();
+public interface MemberDayQuest extends Typable<QuestType> {
 
     default boolean isTarget(Object value) {
         return getTarget().equals(value);
     }
 
     Object getTarget();
+
+    String getDisplay();
 
     int getMinCount();
 

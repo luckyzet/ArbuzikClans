@@ -17,13 +17,15 @@ class MemberDayQuestImpl implements MemberDayQuest {
 
     private final QuestType type;
     private final Object target;
+    private final String display;
     private final int minCount, maxCount;
 
-    MemberDayQuestImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, QuestType type, Object target, int minCount, int maxCount) {
+    MemberDayQuestImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, QuestType type, Object target, String display, int minCount, int maxCount) {
         this.messageConfig = messageConfig;
         this.executors = executors;
         this.type = type;
         this.target = target;
+        this.display = display;
         this.minCount = minCount;
         this.maxCount = maxCount;
     }
@@ -39,6 +41,11 @@ class MemberDayQuestImpl implements MemberDayQuest {
     }
 
     @Override
+    public String getDisplay() {
+        return display;
+    }
+
+    @Override
     public int getMinCount() {
         return minCount;
     }
@@ -50,7 +57,7 @@ class MemberDayQuestImpl implements MemberDayQuest {
 
     @Override
     public MemberQuest toMemberQuest(int count, ClanMember member) {
-        return new MemberQuestImpl(member, executors, messageConfig, target, maxCount, count);
+        return new MemberQuestImpl(member, executors, messageConfig, display, target, maxCount, count);
     }
 
     @Override
@@ -58,8 +65,15 @@ class MemberDayQuestImpl implements MemberDayQuest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MemberDayQuestImpl that = (MemberDayQuestImpl) o;
-        return new EqualsBuilder().append(minCount, that.minCount).append(maxCount, that.maxCount).append(messageConfig, that.messageConfig)
-                .append(executors, that.executors).append(type, that.type).append(target, that.target).isEquals();
+        return new EqualsBuilder()
+                .append(minCount, that.minCount)
+                .append(maxCount, that.maxCount)
+                .append(messageConfig, that.messageConfig)
+                .append(executors, that.executors)
+                .append(type, that.type)
+                .append(target, that.target)
+                .append(display, that.display)
+                .isEquals();
     }
 
     @Override
@@ -69,6 +83,7 @@ class MemberDayQuestImpl implements MemberDayQuest {
                 .append(executors)
                 .append(type)
                 .append(target)
+                .append(display)
                 .append(minCount)
                 .append(maxCount)
                 .toHashCode();

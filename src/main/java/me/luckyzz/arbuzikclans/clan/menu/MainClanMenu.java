@@ -1,0 +1,89 @@
+package me.luckyzz.arbuzikclans.clan.menu;
+
+import me.luckkyyz.luckapi.chat.input.ChatInputMessageService;
+import me.luckkyyz.luckapi.config.MessageConfig;
+import me.luckkyyz.luckapi.menu.MenuSession;
+import me.luckkyyz.luckapi.menu.PreparedMenu;
+import me.luckkyyz.luckapi.menu.button.ClickCallback;
+import me.luckkyyz.luckapi.menu.button.MenuButton;
+import me.luckkyyz.luckapi.menu.filling.PatternFillingStrategy;
+import me.luckkyyz.luckapi.message.Message;
+import me.luckkyyz.luckapi.util.date.FormatDate;
+import me.luckkyyz.luckapi.util.inventory.ChestInventorySize;
+import me.luckkyyz.luckapi.util.itemstack.ItemBuilders;
+import me.luckyzz.arbuzikclans.clan.Clan;
+import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.config.MenuText;
+import me.luckyzz.arbuzikclans.config.Messages;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
+public class MainClanMenu extends AbstractClanMenu {
+
+    MainClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService) {
+        super(ClanMenuType.MAIN, messageConfig, menuText, menuService, inputMessageService);
+    }
+
+    @Override
+    public void openMenu(ClanMember member, Object... args) {
+        Clan clan = member.getClan();
+
+        Function<Message, String> placeholders = message -> message.toAdaptive()
+                .placeholder("%name%", clan.getName())
+                .placeholder("%date%", clan.getDateCreated(FormatDate.DATE))
+                .placeholder("%rank%", member.getRank().getPrefix())
+                .placeholder("%id%", clan.getId())
+                .placeholder("%members_all%", clan.getMembers().getAllMembers().size())
+                .placeholder("%members_max%", clan.getMembers().getMaxMembers())
+                .placeholder("%members_online%", clan.getMembers().getAllMembers().stream().mapToInt(member1 -> member1.isOnline() ? 1 : 0).sum())
+                .toRawText();
+
+        PatternFillingStrategy<MenuSession> patternFillingStrategy = new PatternFillingStrategy<>().setPattern("----A----", "---D-С-B-", "---------")
+                .withButton('A', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.COMPASS)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_COMPASS_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_COMPASS_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                    }
+                })).withButton('B', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.ENDER_PEARL)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_BASE_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_BASE_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.BASE).openMenu(member);
+                    }
+                })).withButton('С', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.PLAYER_HEAD)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_HEAD_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_HEAD_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.MEMBERS).openMenu(member);
+                    }
+                })).withButton('D', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.WHEAT_SEEDS)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_QUEST_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_QUEST_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.QUESTS).openMenu(member);
+                    }
+                }));
+
+        member.apply(player -> PreparedMenu.newBuilder()
+                .setSize(ChestInventorySize.THREE_ROWS)
+                .setTitleGenerator(session -> menuText.getAdaptiveMessage(MenuText.MAIN_MENU_TITLE).placeholder("%name%", clan.getName()).toRawText())
+                .setFillingStrategy(patternFillingStrategy)
+                .create().open(player));
+    }
+}

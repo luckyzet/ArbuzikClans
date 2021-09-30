@@ -4,7 +4,6 @@ import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckyzz.arbuzikclans.config.ClanConfig;
 import me.luckyzz.arbuzikclans.config.Messages;
-import me.luckyzz.arbuzikclans.config.Settings;
 import org.bukkit.entity.Player;
 
 public class ConfigFormatNameCheck implements FormatNameCheck {
@@ -20,16 +19,22 @@ public class ConfigFormatNameCheck implements FormatNameCheck {
     @Override
     public boolean checkName(Player player, String name) {
         if (!config.getBoolean("name.colors") && name.contains(ColorUtils.ALTERNATIVE_CODE_STRING)) {
-            messageConfig.getMessage(Messages.CLAN_CREATE_NOT_COLORS).send(player);
+            if (player != null) {
+                messageConfig.getMessage(Messages.CLAN_CREATE_NOT_COLORS).send(player);
+            }
             return false;
         }
 
         if(name.length() < config.getInt("name.min") || name.length() > config.getInt("name.max")) {
-            messageConfig.getMessage(Messages.NAME_LENGTH).send(player);
+            if (player != null) {
+                messageConfig.getMessage(Messages.NAME_LENGTH).send(player);
+            }
             return false;
         }
         if(!config.getBoolean("name.spaces") && name.contains(" ")) {
-            messageConfig.getMessage(Messages.NAME_SPACE).send(player);
+            if (player != null) {
+                messageConfig.getMessage(Messages.NAME_SPACE).send(player);
+            }
             return false;
         }
         return true;
