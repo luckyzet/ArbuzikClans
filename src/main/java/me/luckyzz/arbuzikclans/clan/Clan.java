@@ -5,6 +5,7 @@ import me.luckkyyz.luckapi.message.StringMessage;
 import me.luckkyyz.luckapi.util.date.DateFormat;
 import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
+import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMutes;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRanks;
@@ -44,6 +45,8 @@ public interface Clan {
     ClanRegion getRegion();
 
     ClanChat getChat();
+
+    ClanChatMutes getChatMutes();
 
     void send(Message message);
 

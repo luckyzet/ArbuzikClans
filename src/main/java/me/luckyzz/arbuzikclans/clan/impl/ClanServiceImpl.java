@@ -14,6 +14,8 @@ import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckkyyz.luckapi.util.location.LocationSerializers;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.ClanService;
+import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMute;
+import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMutes;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuest;
@@ -100,8 +102,7 @@ public class ClanServiceImpl implements ClanService {
                 ")");
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanChats` (" +
                 "`clan` INT NOT NULL PRIMARY KEY, " +
-                "`enabled` VARCHAR(6) NOT NULL, " +
-                "`muted` TEXT NOT NULL" +
+                "`enabled` VARCHAR(6) NOT NULL" +
                 ")");
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanRanks` (" +
                 "`clan` INT NOT NULL, " +
@@ -120,6 +121,13 @@ public class ClanServiceImpl implements ClanService {
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanUpgrades` (" +
                 "`clan` INT NOT NULL, " +
                 "`id` INT NOT NULL" +
+                ")");
+        executors.sync().update("CREATE TABLE IF NOT EXISTS `clanMutes` (" +
+                "`clan` INT NOT NULL, " +
+                "`muted` VARCHAR(64) NOT NULL PRIMARY KEY, " +
+                "`whoMute` VARCHAR(64) NOT NULL, " +
+                "`reason` TEXT NOT NULL, " +
+                "`timeExpire` BIGINT NOT NULL" +
                 ")");
 
         reload();
@@ -227,6 +235,23 @@ public class ClanServiceImpl implements ClanService {
                     }, id);
                     ClanMembersImpl members = new ClanMembersImpl(plugin, this, config, executors, messageConfig, memberDayQuestsService, memberMap);
 
+                    Map<String, ClanChatMute> muteMap = new HashMap<>();
+                    executors.sync().result("SELECT * FROM clanMutes WHERE clan = ?", result -> {
+                        while (result.next()) {
+                            String muted = result.getString("muted");
+                            String whoMute = result.getString("whoMute");
+                            String reason = result.getString("reason");
+                            long timeWhenExpire = result.getLong("timeExpire");
+
+                            ClanMember mutedMember = members.getMember(muted);
+                            ClanMember whoMuteMember = members.getMember(whoMute);
+
+                            TimeClanChatMute mute = new TimeClanChatMute(executors, messageConfig, whoMuteMember, mutedMember, reason, timeWhenExpire);
+                            muteMap.put(mute.getMuted().getName(), mute);
+                        }
+                    }, id);
+                    ClanChatMutesImpl mutes = new ClanChatMutesImpl(executors, messageConfig, muteMap);
+
                     AtomicReference<ClanRegionImpl> region = new AtomicReference<>();
                     executors.sync().result("SELECT * FROM clanRegions WHERE clan = ?", result -> {
                         if(result.next()) {
@@ -255,27 +280,23 @@ public class ClanServiceImpl implements ClanService {
                     executors.sync().result("SELECT * FROM clanChats WHERE clan = ?", result -> {
                         if(result.next()) {
                             boolean chatEnabled = result.getBoolean("enabled");
-                            String mutedString = result.getString("muted");
 
-                            Set<ClanMember> muted = Arrays.stream(mutedString.split(","))
-                                    .map(memberMap::get)
-                                    .collect(Collectors.toSet());
-
-                            chat.set(new ClanChatImpl(messageConfig, executors, chatEnabled, muted));
+                            chat.set(new ClanChatImpl(messageConfig, executors, chatEnabled));
 
                             return;
                         }
-                        chat.set(new ClanChatImpl(messageConfig, executors, true, new HashSet<>()));
+                        chat.set(new ClanChatImpl(messageConfig, executors, true));
                     }, id);
 
                     ClanRegionImpl clanRegion = region.get();
                     ClanChatImpl clanChat = chat.get();
-                    Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, date, name, members, upgrades, ranks, money, coins, clanRegion, clanChat);
+                    Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, date, name, members, upgrades, ranks, money, coins, clanRegion, clanChat, mutes);
                     members.setClan(clan);
                     upgrades.setClan(clan);
                     ranks.setClan(clan);
                     clanRegion.setClan(clan);
                     clanChat.setClan(clan);
+                    mutes.setClan(clan);
 
                     members.getAllMembers().forEach(member -> member.getQuests().forEach(quest -> {
                         if (quest instanceof MemberQuestImpl) {
@@ -359,9 +380,11 @@ public class ClanServiceImpl implements ClanService {
         ClanRanksImpl ranks = new ClanRanksImpl(executors, new HashMap<>());
 
         ClanRegionImpl region = new ClanRegionImpl(this, config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>());
-        ClanChatImpl chat = new ClanChatImpl(messageConfig, executors, true, new HashSet<>());
+        ClanChatImpl chat = new ClanChatImpl(messageConfig, executors, true);
 
-        Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat);
+        ClanChatMutesImpl mutes = new ClanChatMutesImpl(executors, messageConfig, new HashMap<>());
+
+        Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat, mutes);
 
         upgrades.setClan(clan);
         ranks.setClan(clan);
@@ -373,9 +396,11 @@ public class ClanServiceImpl implements ClanService {
         region.setClan(clan);
         chat.setClan(clan);
 
+        mutes.setClan(clan);
+
         executors.async().update("INSERT INTO clans VALUES (?, ?, ?, ?, ?)", clan.getId(), clan.getDateCreated(FormatDate.DATE), clan.getName(), clan.getMoney(), clan.getCoins());
         executors.async().update("INSERT INTO clanRegions VALUES (?, ?, ?, ?, ?, ?)", clan.getId(), "null", false, false, "", "");
-        executors.async().update("INSERT INTO clanChats VALUES (?, ?, ?)", clan.getId(), true, "");
+        executors.async().update("INSERT INTO clanChats VALUES (?, ?)", clan.getId(), true);
 
         clans.add(clan);
 

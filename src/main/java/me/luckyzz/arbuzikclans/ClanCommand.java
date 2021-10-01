@@ -14,8 +14,11 @@ import me.luckyzz.arbuzikclans.clan.member.invite.ClanInviteService;
 import me.luckyzz.arbuzikclans.clan.menu.ClanMenuService;
 import me.luckyzz.arbuzikclans.clan.menu.ClanMenuType;
 import me.luckyzz.arbuzikclans.config.Messages;
+import me.luckyzz.arbuzikclans.util.DurationUtil;
 import me.luckyzz.arbuzikclans.util.Permissions;
 import org.bukkit.entity.Player;
+
+import java.time.Duration;
 
 final class ClanCommand {
 
@@ -24,7 +27,6 @@ final class ClanCommand {
         ChatCommand.registerCommand("clan", ExecutingStrategy.newBuilder()
                 .subCommandStrategy()
                 .addCheck(ExecutingChecks.player(), actions.messageSend(Messages.ONLY_PLAYER))
-                .addCheck(ExecutingChecks.permission(Permissions.CLAN), actions.messageSend(Messages.NO_PERMISSION))
                 .whenSubCommandAbsent(actions.messageSend(Messages.NOT_COMMAND))
                 .whenArgumentAbsent((executor, ignored) -> {
                     Player player = executor.getPlayer();
@@ -40,7 +42,6 @@ final class ClanCommand {
                 .addSubCommand("help", ExecutingStrategy.newBuilder().commandStrategy().addAction(actions.messageSend(Messages.CLAN_HELP)))
                 .addSubCommand("create", ExecutingStrategy.newBuilder()
                         .commandStrategy()
-                        .addCheck(ExecutingChecks.permission(Permissions.CLAN_CREATE), actions.messageSend(Messages.NO_PERMISSION))
                         .addCheck(ExecutingChecks.argumentsLength(1, Integer.MAX_VALUE), actions.messageSend(Messages.CLAN_CREATE_USAGE))
                         .addAction((executor, arguments) -> {
                             StringBuilder name = new StringBuilder();
@@ -78,7 +79,12 @@ final class ClanCommand {
                                         messageConfig.getAdaptiveMessage(Messages.NOT_IN_CLAN).placeholder("%name%", name).send(executor);
                                         return;
                                     }
-                                    clan.getRegion().setAccessBlocks(!clan.getRegion().getAccessBlocksWhitelist(member), member, clan.getMembers().getMember(executor.getPlayer()));
+                                    ClanMember executorMember = clan.getMembers().getMember(executor.getPlayer());
+                                    if(!executorMember.getClan().equals(member.getClan())) {
+                                        messageConfig.getMessage(Messages.NOT_YOUR_CLAN).send(executor);
+                                        return;
+                                    }
+                                    clan.getRegion().setAccessBlocks(!clan.getRegion().getAccessBlocksWhitelist(member), member, executorMember);
                                 })
                         ).addSubCommand("chests", ExecutingStrategy.newBuilder()
                                 .commandStrategy()
@@ -99,7 +105,12 @@ final class ClanCommand {
                                         messageConfig.getAdaptiveMessage(Messages.NOT_IN_CLAN).placeholder("%name%", name).send(executor);
                                         return;
                                     }
-                                    clan.getRegion().setAccessChest(!clan.getRegion().getAccessChestWhitelist(member), member, clan.getMembers().getMember(executor.getPlayer()));
+                                    ClanMember executorMember = clan.getMembers().getMember(executor.getPlayer());
+                                    if(!executorMember.getClan().equals(member.getClan())) {
+                                        messageConfig.getMessage(Messages.NOT_YOUR_CLAN).send(executor);
+                                        return;
+                                    }
+                                    clan.getRegion().setAccessChest(!clan.getRegion().getAccessChestWhitelist(member), member, executorMember);
                                 })
                         )
                 ).addSubCommand("invite", ExecutingStrategy.newBuilder()
@@ -155,8 +166,6 @@ final class ClanCommand {
                             }
                             Clan clan = member.getClan();
 
-
-
                             StringBuilder name = new StringBuilder();
                             while (arguments.hasNext()) {
                                 name.append(arguments.next()).append(" ");
@@ -166,14 +175,41 @@ final class ClanCommand {
                         })
                 ).addSubCommand("chatmute", ExecutingStrategy.newBuilder()
                         .commandStrategy()
+                        .addCheck(ExecutingChecks.argumentsLength(3, Integer.MAX_VALUE), actions.messageSend(Messages.CLAN_MUTE_USAGE))
+                        .addCheck(session -> clanService.hasClan(session.getExecutor().getPlayer()), actions.messageSend(Messages.NOT_CLAN))
+                        .addCheck(session -> clanService.hasClan(session.getArguments().get(1)), session -> messageConfig.getAdaptiveMessage(Messages.NOT_IN_CLAN)
+                                .placeholder("%name%", session.getArguments().get(1)).send(session.getExecutor()))
+                        .addAction((executor, arguments) -> {
+                            ClanMember muted = clanService.getClanMemberPlayer(arguments.next());
+                            if(muted == null) {
+                                messageConfig.getAdaptiveMessage(Messages.NOT_IN_CLAN).placeholder("%name%", arguments.get(1)).send(executor);
+                                return;
+                            }
 
+                            Duration duration = DurationUtil.parseDuration(arguments.next());
+                            if(duration.getSeconds() <= 0) {
+                                messageConfig.getMessage(Messages.CLAN_MUTE_DURATION_ZERO).send(executor);
+                                return;
+                            }
+                            ClanMember whoMute = clanService.getClanMemberPlayer(executor.getPlayer());
+                            if(!muted.getClan().equals(whoMute.getClan())) {
+                                messageConfig.getMessage(Messages.NOT_YOUR_CLAN).send(executor);
+                                return;
+                            }
+
+                            StringBuilder reason = new StringBuilder();
+                            while (arguments.hasNext()) {
+                                reason.append(arguments.next()).append(" ");
+                            }
+
+                            muted.getClan().getChatMutes().mute(muted, whoMute, duration.toMillis(), reason.toString().trim());
+                        }), "mute", "clanmute"
                 )
         );
 
         ChatCommand.registerCommand("clanchat", ExecutingStrategy.newBuilder()
                 .commandStrategy()
                 .addCheck(ExecutingChecks.player(), actions.messageSend(Messages.ONLY_PLAYER))
-                .addCheck(ExecutingChecks.permission(Permissions.CLAN_CHAT), actions.messageSend(Messages.NO_PERMISSION))
                 .addCheck(session -> clanService.hasClan(session.getExecutor().getPlayer()), actions.messageSend(Messages.NOT_CLAN))
                 .addCheck(ExecutingChecks.argumentsLength(1, Integer.MAX_VALUE), actions.messageSend(Messages.CLAN_CHAT_EMPTY))
                 .addAction((executor, arguments) -> {

@@ -15,7 +15,8 @@ public enum RankPossibility {
     RANK_GIVE,
     KICK_OTHER,
     UPGRADE,
-    REGION_MANAGE
+    REGION_MANAGE,
+    MUTE
 
 
 }

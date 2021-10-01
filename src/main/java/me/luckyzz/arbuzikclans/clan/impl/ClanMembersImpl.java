@@ -141,11 +141,10 @@ class ClanMembersImpl implements ClanMembers {
         executors.async().update("DELETE FROM clanQuests WHERE name = ?", member.getName());
 
         Clan clan = member.getClan();
-        ClanChat chat = clan.getChat();
         ClanRegion region = clan.getRegion();
         region.setAccessChestSilently(false, member);
         region.setAccessBlocksSilently(false, member);
-        chat.setMutedSilently(member, false);
+        clan.getChatMutes().unmuteSilently(member);
 
         clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_MEMBER_KICKED)
                 .placeholder("%rank%", whoRemove.getRank().getPrefix())

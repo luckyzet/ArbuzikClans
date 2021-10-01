@@ -11,8 +11,4 @@ public interface ClanChat {
 
     void setChatEnabled(boolean can, ClanMember member);
 
-    void setMuted(ClanMember muted, boolean isMuted, ClanMember member);
-
-    void setMutedSilently(ClanMember muted, boolean isMuted);
-
 }

@@ -8,6 +8,7 @@ import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
+import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMutes;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.ClanMembers;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRanks;
@@ -39,10 +40,11 @@ class ClanImpl implements Clan {
     private final ClanRanks ranks;
     private final ClanRegion region;
     private final ClanChat chat;
+    private final ClanChatMutes mutes;
     private String name;
     private int money, coins;
 
-    ClanImpl(ClanConfig config, MessageConfig<Messages> messageConfig, EconomyProvider economyProvider, QueryExecutors executors, FormatNameCheck formatNameCheck, int id, LocalDate dateCreated, String name, ClanMembers members, ClanUpgrades upgrades, ClanRanks ranks, int money, int coins, ClanRegion region, ClanChat chat) {
+    ClanImpl(ClanConfig config, MessageConfig<Messages> messageConfig, EconomyProvider economyProvider, QueryExecutors executors, FormatNameCheck formatNameCheck, int id, LocalDate dateCreated, String name, ClanMembers members, ClanUpgrades upgrades, ClanRanks ranks, int money, int coins, ClanRegion region, ClanChat chat, ClanChatMutes mutes) {
         this.config = config;
         this.messageConfig = messageConfig;
         this.economyProvider = economyProvider;
@@ -59,6 +61,7 @@ class ClanImpl implements Clan {
         this.coins = coins;
         this.region = region;
         this.chat = chat;
+        this.mutes = mutes;
     }
 
     @Override
@@ -177,6 +180,11 @@ class ClanImpl implements Clan {
     }
 
     @Override
+    public ClanChatMutes getChatMutes() {
+        return mutes;
+    }
+
+    @Override
     public void send(Message message) {
         members.getAllMembers().forEach(member -> member.apply(message::send));
     }
@@ -188,39 +196,13 @@ class ClanImpl implements Clan {
         ClanImpl clan = (ClanImpl) o;
         return new EqualsBuilder()
                 .append(id, clan.id)
-                .append(money, clan.money)
-                .append(coins, clan.coins)
-                .append(config, clan.config)
-                .append(messageConfig, clan.messageConfig)
-                .append(economyProvider, clan.economyProvider)
-                .append(executors, clan.executors)
-                .append(dateCreated, clan.dateCreated)
-                .append(name, clan.name)
-                .append(members, clan.members)
-                .append(upgrades, clan.upgrades)
-                .append(ranks, clan.ranks)
-                .append(region, clan.region)
-                .append(chat, clan.chat)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(config)
-                .append(messageConfig)
-                .append(economyProvider)
-                .append(executors)
                 .append(id)
-                .append(dateCreated)
-                .append(name)
-                .append(members)
-                .append(upgrades)
-                .append(ranks)
-                .append(money)
-                .append(coins)
-                .append(region)
-                .append(chat)
                 .toHashCode();
     }
 }

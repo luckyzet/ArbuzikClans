@@ -31,16 +31,18 @@ public enum Messages implements MessagePath {
     CLAN_CHAT_EMPTY("clan.chat.emptyMessage", "&cВы не можете отправить в чат пустое сообщение!"),
     CLAN_CHAT_FORMAT("clan.chat.format", "&7[&cК.Чат&7] &f%rank% %name%&7: &f%message%"),
     CLAN_CHAT_DISABLED("clan.chat.disabled", "&cКлановый чат выключен!"),
-    CLAN_CHAT_MUTED("clan.chat.muted", "&cВы заглушены в клановом чате!"),
     CLAN_CHAT_ENABLED_EXECUTOR("clan.chat.enabled.executor", "&fВы успешно включили клановый чат!"),
     CLAN_CHAT_ENABLED_LOCAL("clan.chat.enabled.local", "&7[&cКлан&7] &f%rank% %name% &fвключил клановый чат!"),
     CLAN_CHAT_DISABLED_EXECUTOR("clan.chat.disabled.executor", "&fВы успешно выключили клановый чат!"),
     CLAN_CHAT_DISABLED_LOCAL("clan.chat.disabled.local", "&7[&cКлан&7] &f%rank% %name% &fвыключил клановый чат!"),
-    CLAN_CHAT_MUTE_ENABLED_EXECUTOR("clan.chat.muteEnabled.executor", "&fВы успешно выдали мут игроку %name%!"),
-    CLAN_CHAT_MUTE_ENABLED_LOCAL("clan.chat.muteEnabled.local", "&7[&cКлан&7] &f%rank% %name% &fвыдал мут в клановом чате игроку %rank_muted% %name_muted%"),
-    CLAN_CHAT_MUTE_DISABLED_EXECUTOR("clan.chat.muteDisable.executor", "&fВы успешно сняли мут с игрока %name%!"),
-    CLAN_CHAT_MUTE_DISABLED_LOCAL("clan.chat.muteDisable.local", "&7[&cКлан&7] &f%rank% %name% &fснял мут в клановом чате с игрока &c%rank_muted% %name_muted%"),
+
+    CLAN_CHAT_MUTED("clan.chat.muted", "&cВы заглушены в клановом чате! Оставшееся время - %time%. Причина - %reason%"),
+    CLAN_CHAT_MUTED_EXECUTOR("clan.chat.muteEnabled.executor", "&fВы успешно выдали мут игроку %name%!"),
+    CLAN_CHAT_MUTED_LOCAL("clan.chat.muteEnabled.local", "&7[&cКлан&7] &f%rank% %name% &fвыдал мут в клановом чате на &c%duration% &fигроку &c%rank_muted% &c%name_muted%&f. Причина &7- &c%reason%"),
     CLAN_CHAT_MUTE_NOT_YOURSELF("clan.chat.mute.notYourself", "&cВы не можете замутить сами себя!"),
+
+    CLAN_CHAT_MUTED_ALREADY("clan.chat.mutedAlready", "&cЭтот игрок уже заглушен!"),
+
     SUCCESS_BUT_ALREADY("successButAlready", "&fУспешно, но ничего не изменилось от этого действия!"),
     CLAN_REGION_ACCESS_BLOCKS_ENABLED_EXECUTOR("clan.region.accessBlocks.enabled.executor", "&fВы успешно включили доступ к региону клана!"),
     CLAN_REGION_ACCESS_BLOCKS_ENABLED_LOCAL("clan.region.accessBlocks.enabled.executor", "&7[&cКлан&7] &c%rank% &c%name% &fвключил доступ к региону клана"),
@@ -107,7 +109,11 @@ public enum Messages implements MessagePath {
     NOT_INVITE("clan.invite.notInvite", "&cВас никто не приглашал в клан!"),
     QUEST_COINS_GAVE("clan.quests.gaveCoins", "&7[&cКлан&7] &c%rank% &c%name% &fдобавил в козну &c%amount% коинов &fза счет выполнения квеста! (Всего &c%sum_amount% коинов&f)"),
     CLAN_RENAME_USAGE("clan.rename.usage", "&cИспользуй - /clan rename [Название]"),
-    CLAN_REGION_SETTING("clan.region.setting", "&cИдет установка региона... Ожидайте!");
+    CLAN_REGION_SETTING("clan.region.setting", "&fИдет установка региона... Ожидайте!"),
+    NOT_YOUR_CLAN("notYourClan", "&cЭтот человек не находится в Вашем клане!"),
+
+    CLAN_MUTE_USAGE("clan.mute.usage", "&cИспользуй - /clan mute [Ник] [Время(2h,1m,3s)] [Причина]"),
+    CLAN_MUTE_DURATION_ZERO("clan.mute.durationZero", "&cВремя мута не может быть нулём! (Возможно неправильный формат, пример, 3h,2m)");
 
     private final String path, defaultValue;
 

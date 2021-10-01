@@ -6,27 +6,27 @@ import me.luckkyyz.luckapi.message.AdaptiveMessage;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
+import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMute;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.config.Messages;
+import me.luckyzz.arbuzikclans.util.DurationUtil;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-// TODO: Messages send
 class ClanChatImpl implements ClanChat {
 
     private final MessageConfig<Messages> messageConfig;
     private final QueryExecutors executors;
-    private final Set<ClanMember> muted;
     private Clan clan;
     private boolean chatEnabled;
 
-    ClanChatImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, boolean chatEnabled, Set<ClanMember> muted) {
+    ClanChatImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, boolean chatEnabled) {
         this.messageConfig = messageConfig;
         this.executors = executors;
         this.chatEnabled = chatEnabled;
-        this.muted = muted;
     }
 
     @Override
@@ -49,8 +49,12 @@ class ClanChatImpl implements ClanChat {
             messageConfig.getMessage(Messages.CLAN_CHAT_DISABLED).send(player);
             return;
         }
-        if (muted.contains(member)) {
-            messageConfig.getMessage(Messages.CLAN_CHAT_MUTED).send(player);
+        ClanChatMute mute = clan.getChatMutes().getMute(member);
+        if (mute != null && mute.checkActual()) {
+            messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTED)
+                    .placeholder("%time%", DurationUtil.formatDuration(Duration.ofMillis(((TimeClanChatMute) mute).getTimeLeft())))
+                    .placeholder("%reason%", mute.getReason())
+                    .send(player);
             return;
         }
         if (message.isEmpty()) {
@@ -74,63 +78,63 @@ class ClanChatImpl implements ClanChat {
         executors.async().update("UPDATE clanChats SET enabled = ? WHERE clan = ?", chatEnabled, clan.getId());
 
         if (chatEnabled) {
-            member.apply(player -> messageConfig.getMessage(Messages.CLAN_CHAT_MUTE_ENABLED_EXECUTOR).send(player));
-            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_ENABLED_LOCAL)
+            member.apply(player -> messageConfig.getMessage(Messages.CLAN_CHAT_ENABLED_EXECUTOR).send(player));
+            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_ENABLED_LOCAL)
                     .placeholder("%name%", member.getName())
                     .placeholder("%rank%", member.getRank().getPrefix()));
         } else {
-            member.apply(player -> messageConfig.getMessage(Messages.CLAN_CHAT_MUTE_DISABLED_EXECUTOR).send(player));
-            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_DISABLED_LOCAL)
+            member.apply(player -> messageConfig.getMessage(Messages.CLAN_CHAT_DISABLED_EXECUTOR).send(player));
+            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_DISABLED_LOCAL)
                     .placeholder("%name%", member.getName())
                     .placeholder("%rank%", member.getRank().getPrefix()));
         }
     }
 
-    @Override
-    public void setMuted(ClanMember muted, boolean isMuted, ClanMember member) {
-        if (muted.equals(member)) {
-            member.apply(player -> messageConfig.getMessage(Messages.CLAN_CHAT_MUTE_NOT_YOURSELF).send(player));
-            return;
-        }
-        if (this.muted.contains(muted) == isMuted) {
-            member.apply(player -> messageConfig.getMessage(Messages.SUCCESS_BUT_ALREADY).send(player));
-            return;
-        }
-        if (isMuted) {
-            this.muted.add(muted);
-            member.apply(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_ENABLED_EXECUTOR)
-                    .placeholder("%name%", muted.getName())
-                    .send(player));
-            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_ENABLED_LOCAL)
-                    .placeholder("%name%", member.getName())
-                    .placeholder("%rank%", member.getRank().getPrefix())
-                    .placeholder("%name_muted%", muted.getName())
-                    .placeholder("%rank_muted%", muted.getRank().getPrefix()));
-        } else {
-            this.muted.remove(muted);
-            member.apply(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_DISABLED_EXECUTOR)
-                    .placeholder("%name%", muted.getName())
-                    .send(player));
-            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_DISABLED_LOCAL)
-                    .placeholder("%name%", member.getName())
-                    .placeholder("%rank%", member.getRank().getPrefix())
-                    .placeholder("%name_muted%", muted.getName())
-                    .placeholder("%rank_muted%", muted.getRank().getPrefix()));
-        }
-
-        String mutedString = this.muted.stream().map(ClanMember::getName).collect(Collectors.joining(","));
-        executors.async().update("UPDATE clanChats SET muted = ? WHERE clan = ?", mutedString, clan.getId());
-    }
-
-    @Override
-    public void setMutedSilently(ClanMember muted, boolean isMuted) {
-        if (isMuted) {
-            this.muted.add(muted);
-        } else {
-            this.muted.remove(muted);
-        }
-
-        String mutedString = this.muted.stream().map(ClanMember::getName).collect(Collectors.joining(","));
-        executors.async().update("UPDATE clanChats SET muted = ? WHERE clan = ?", mutedString, clan.getId());
-    }
+//    @Override
+//    public void setMuted(ClanMember muted, boolean isMuted, ClanMember member) {
+//        if (muted.equals(member)) {
+//            member.apply(player -> messageConfig.getMessage(Messages.CLAN_CHAT_MUTE_NOT_YOURSELF).send(player));
+//            return;
+//        }
+//        if (this.muted.contains(muted) == isMuted) {
+//            member.apply(player -> messageConfig.getMessage(Messages.SUCCESS_BUT_ALREADY).send(player));
+//            return;
+//        }
+//        if (isMuted) {
+//            this.muted.add(muted);
+//            member.apply(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_ENABLED_EXECUTOR)
+//                    .placeholder("%name%", muted.getName())
+//                    .send(player));
+//            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_ENABLED_LOCAL)
+//                    .placeholder("%name%", member.getName())
+//                    .placeholder("%rank%", member.getRank().getPrefix())
+//                    .placeholder("%name_muted%", muted.getName())
+//                    .placeholder("%rank_muted%", muted.getRank().getPrefix()));
+//        } else {
+//            this.muted.remove(muted);
+//            member.apply(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_DISABLED_EXECUTOR)
+//                    .placeholder("%name%", muted.getName())
+//                    .send(player));
+//            clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_CHAT_MUTE_DISABLED_LOCAL)
+//                    .placeholder("%name%", member.getName())
+//                    .placeholder("%rank%", member.getRank().getPrefix())
+//                    .placeholder("%name_muted%", muted.getName())
+//                    .placeholder("%rank_muted%", muted.getRank().getPrefix()));
+//        }
+//
+//        String mutedString = this.muted.stream().map(ClanMember::getName).collect(Collectors.joining(","));
+//        executors.async().update("UPDATE clanChats SET muted = ? WHERE clan = ?", mutedString, clan.getId());
+//    }
+//
+//    @Override
+//    public void setMutedSilently(ClanMember muted, boolean isMuted) {
+//        if (isMuted) {
+//            this.muted.add(muted);
+//        } else {
+//            this.muted.remove(muted);
+//        }
+//
+//        String mutedString = this.muted.stream().map(ClanMember::getName).collect(Collectors.joining(","));
+//        executors.async().update("UPDATE clanChats SET muted = ? WHERE clan = ?", mutedString, clan.getId());
+//    }
 }
