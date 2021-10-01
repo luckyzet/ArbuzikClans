@@ -4,6 +4,7 @@ import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuest;
+import me.luckyzz.arbuzikclans.clan.member.quest.QuestType;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -15,26 +16,31 @@ class MemberQuestImpl implements MemberQuest {
     private final QueryExecutors executors;
     private final MessageConfig<Messages> messageConfig;
     private final String display;
+    private final QuestType type;
     private final Object target;
-    private final int needCount;
+    private final int needCount, coins;
     private ClanMember member;
     private int count;
 
-    MemberQuestImpl(QueryExecutors executors, MessageConfig<Messages> messageConfig, String display, Object target, int needCount, int count) {
+    MemberQuestImpl(QueryExecutors executors, MessageConfig<Messages> messageConfig, String display, QuestType type, Object target, int coins, int needCount, int count) {
         this.executors = executors;
         this.messageConfig = messageConfig;
         this.display = display;
+        this.type = type;
         this.target = target;
+        this.coins = coins;
         this.needCount = needCount;
         this.count = count;
     }
 
-    MemberQuestImpl(ClanMember member, QueryExecutors executors, MessageConfig<Messages> messageConfig, String display, Object target, int needCount, int count) {
+    MemberQuestImpl(ClanMember member, QueryExecutors executors, MessageConfig<Messages> messageConfig, String display, QuestType type, Object target, int coins, int needCount, int count) {
         this.member = member;
         this.executors = executors;
         this.messageConfig = messageConfig;
         this.display = display;
+        this.type = type;
         this.target = target;
+        this.coins = coins;
         this.needCount = needCount;
         this.count = count;
     }
@@ -46,13 +52,23 @@ class MemberQuestImpl implements MemberQuest {
 
     @Override
     public String getTargetName() {
-        return target instanceof EntityType ? "Entity " + ((EntityType) target).name() :
-                target instanceof Material ? "Block " + ((Material) target).name() : "null";
+        return target instanceof EntityType ? ((EntityType) target).name() :
+                target instanceof Material ? ((Material) target).name() : "null";
     }
 
     @Override
     public String getDisplay() {
         return display;
+    }
+
+    @Override
+    public int getCoins() {
+        return coins;
+    }
+
+    @Override
+    public QuestType getType() {
+        return type;
     }
 
     @Override
@@ -82,16 +98,17 @@ class MemberQuestImpl implements MemberQuest {
 
         this.count += amount;
 
-        executors.async().update("UPDATE quests SET count = ? WHERE name = ?", this.count, member.getName());
+        executors.async().update("UPDATE clanQuests SET count = ? WHERE name = ?", this.count, member.getName());
 
         if (isFinished()) {
             member.apply(player -> messageConfig.getMessage(Messages.CLAN_QUESTS_FINISHED).send(player));
             member.addQuestCompleted();
-            member.getClan().changeCoinsQuest(1, member);
+            member.getClan().changeCoinsQuest(coins, member);
         } else {
             member.apply(player -> messageConfig.getAdaptiveMessage(Messages.CLAN_QUESTS_COUNT_CHANGE)
                     .placeholder("%count%", this.count)
                     .placeholder("%max%", needCount)
+                    .placeholder("%percent%", ((int) (((double) this.count / (double) needCount) * 100)) + "%")
                     .send(player));
         }
     }

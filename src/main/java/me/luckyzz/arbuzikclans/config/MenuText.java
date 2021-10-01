@@ -51,7 +51,7 @@ public enum MenuText implements MessagePath {
     RANK_MENU_CHANGE_TITLE("rankMenu.give.title", "&fИзменить префикс ранга"),
     MEMBER_MENU_TITLE("memberMenu.title", "&fУчастники клана"),
     MEMBER_MENU_HEAD_NAME("memberMenu.head.name", "%name%"),
-    MEMBER_MENU_HEAD_LORE("memberMenu.head.lore", "\n&fРанг: &c%rank%\n&fПКМ, чтобы выгнать игрока\n&fЛКМ, чтобы изменить ранг"),
+    MEMBER_MENU_HEAD_LORE("memberMenu.head.lore", "\n&fРанг: &c%rank%\n&fПоследний заход: &c%online%\n&fПКМ, чтобы выгнать игрока\n&fЛКМ, чтобы изменить ранг"),
     CONFIRM_MENU_YES_NAME("confirmMenu.yes.name", "&aДА"),
     CONFIRM_MENU_NO_NAME("confirmMenu.no.name", "&aНЕТ"),
     CONFIRM_MENU_TITLE("confirmMenu.title", "&fПодтверждение действия"),
@@ -59,9 +59,11 @@ public enum MenuText implements MessagePath {
     MAIN_MENU_HEAD_LORE("mainMenu.head.lore", "\n&fСписок участников, управление их рангами и прочее"),
     QUEST_MENU_TITLE("questMenu.title", "&fЕжедневные квесты"),
     QUEST_MENU_ITEM_NAME("questMenu.item.name", "%name%"),
-    QUEST_MENU_ITEM_LORE("questMenu.item.lore", "\n&fСтатус: &c%state%\n&fОсталось &c%need% &fшт."),
+    QUEST_MENU_ITEM_LORE("questMenu.item.lore", "\n&fСтатус: &c%state%\n&fОсталось: &c%need% шт.\n&fНаграда: &c%reward_coins%"),
     MAIN_MENU_QUEST_NAME("mainMenu.quest.name", "&7Квесты"),
-    MAIN_MENU_QUEST_LORE("mainMenu.quest.lore", "\n&fСписок ваших ежедневных квестов");
+    MAIN_MENU_QUEST_LORE("mainMenu.quest.lore", "\n&fСписок ваших ежедневных квестов"),
+    BASE_MENU_STICK_NAME("baseMenu.stick.name", "&7Выдать блок региона"),
+    BASE_MENU_STICK_LORE("baseMenu.stick.lore", "\n&fНажмите, для получения блока региона");
 
     private final String path, defaultValue;
 

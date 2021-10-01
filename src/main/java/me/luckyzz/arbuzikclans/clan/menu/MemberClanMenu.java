@@ -9,6 +9,7 @@ import me.luckkyyz.luckapi.menu.button.MenuButton;
 import me.luckkyyz.luckapi.menu.filling.FillingStrategy;
 import me.luckkyyz.luckapi.menu.filling.PatternFillingStrategy;
 import me.luckkyyz.luckapi.message.Message;
+import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckkyyz.luckapi.util.inventory.ChestInventorySize;
 import me.luckkyyz.luckapi.util.itemstack.ItemBuilders;
 import me.luckyzz.arbuzikclans.clan.Clan;
@@ -41,6 +42,7 @@ public class MemberClanMenu extends AbstractClanMenu {
                 .placeholder("%name%", member1.getName())
                 .placeholder("%rank%", member1.getRank().getPrefix())
                 .placeholder("%index%", member1.getRank().getIndex())
+                .placeholder("%online%", member1.isOnline() ? "Онлайн" : member1.getLastJoinTime(FormatDate.DATE_TIME))
                 .toRawText();
 
         char[] symbols = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', '3', 'r', 's', 't', 'u'};

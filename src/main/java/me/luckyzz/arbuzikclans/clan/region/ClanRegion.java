@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface ClanRegion {
 
@@ -20,9 +21,9 @@ public interface ClanRegion {
 
     Location getCenterLocation();
 
-    boolean setCenterLocation(Location location, ClanMember member);
+    CompletableFuture<Boolean> setCenterLocation(Location location, ClanMember member);
 
-    default boolean setCenterLocation(Block block, ClanMember member) {
+    default CompletableFuture<Boolean> setCenterLocation(Block block, ClanMember member) {
         return setCenterLocation(block.getLocation(), member);
     }
 

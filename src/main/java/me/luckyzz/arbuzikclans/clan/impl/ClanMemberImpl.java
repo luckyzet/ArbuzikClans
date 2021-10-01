@@ -2,6 +2,8 @@ package me.luckyzz.arbuzikclans.clan.impl;
 
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
+import me.luckkyyz.luckapi.util.date.DateZone;
+import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuest;
@@ -14,6 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -23,6 +26,7 @@ class ClanMemberImpl implements ClanMember {
     private final QueryExecutors executors;
     private final MessageConfig<Messages> messageConfig;
     private final String name;
+    private LocalDateTime lastJoin;
     private Clan clan;
     private ClanRank rank;
     private Collection<MemberQuest> quests;
@@ -33,6 +37,18 @@ class ClanMemberImpl implements ClanMember {
         this.executors = executors;
         this.messageConfig = messageConfig;
         this.name = name;
+        lastJoin = LocalDateTime.now(DateZone.MOSCOW.getIdentifier());
+        this.rank = rank;
+        this.quests = quests;
+        this.questsCompleted = questsCompleted;
+    }
+
+    ClanMemberImpl(Plugin plugin, QueryExecutors executors, MessageConfig<Messages> messageConfig, String name, LocalDateTime lastJoin, ClanRank rank, Collection<MemberQuest> quests, int questsCompleted) {
+        this.plugin = plugin;
+        this.executors = executors;
+        this.messageConfig = messageConfig;
+        this.name = name;
+        this.lastJoin = lastJoin;
         this.rank = rank;
         this.quests = quests;
         this.questsCompleted = questsCompleted;
@@ -50,6 +66,17 @@ class ClanMemberImpl implements ClanMember {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public LocalDateTime getLastJoinTime() {
+        return lastJoin;
+    }
+
+    @Override
+    public void updateLastJoinTime() {
+        lastJoin = LocalDateTime.now(DateZone.MOSCOW.getIdentifier());
+        executors.async().update("UPDATE clanMembers SET lastJoin = ? WHERE name = ?", getLastJoinTime(FormatDate.DATE_TIME), name);
     }
 
     @Override
@@ -92,7 +119,8 @@ class ClanMemberImpl implements ClanMember {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             executors.sync().update("DELETE FROM clanQuests WHERE name = ?", name);
-            quests.forEach(quest -> executors.sync().update("INSERT INTO clanQuests VALUES (?, ?, ?, ?, ?)", name, quest.getDisplay(), quest.getTargetName(), quest.getCount(), quest.getNeedCount()));
+            quests.forEach(quest -> executors.sync().update("INSERT INTO clanQuests VALUES (?, ?, ?, ?, ?, ?, ?)", name, quest.getDisplay(),
+                    quest.getType().name(), quest.getCoins(), quest.getTargetName(), quest.getCount(), quest.getNeedCount()));
         });
     }
 
@@ -111,31 +139,16 @@ class ClanMemberImpl implements ClanMember {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         ClanMemberImpl that = (ClanMemberImpl) o;
-        return new EqualsBuilder()
-                .append(questsCompleted, that.questsCompleted)
-                .append(plugin, that.plugin)
-                .append(executors, that.executors)
-                .append(messageConfig, that.messageConfig)
-                .append(clan, that.clan)
-                .append(name, that.name)
-                .append(rank, that.rank)
-                .append(quests, that.quests)
-                .isEquals();
+
+        return new EqualsBuilder().append(name, that.name).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(plugin)
-                .append(executors)
-                .append(messageConfig)
-                .append(clan)
-                .append(name)
-                .append(rank)
-                .append(quests)
-                .append(questsCompleted)
-                .toHashCode();
+        return new HashCodeBuilder(17, 37).append(name).toHashCode();
     }
 }

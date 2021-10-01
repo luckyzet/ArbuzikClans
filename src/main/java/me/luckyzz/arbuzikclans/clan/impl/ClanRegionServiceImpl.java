@@ -10,6 +10,7 @@ import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
 import me.luckyzz.arbuzikclans.clan.region.ClanRegionService;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.util.Permissions;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -134,8 +135,11 @@ public class ClanRegionServiceImpl extends ExtendedListener implements ClanRegio
         if (member == null) {
             return;
         }
-        boolean success = clan.getRegion().setCenterLocation(block, member);
-        event.setCancelled(!success);
+        clan.getRegion().setCenterLocation(block, member).thenAccept(success -> {
+            if(!success) {
+                Bukkit.getScheduler().runTask(plugin, () -> block.setType(Material.AIR));
+            }
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

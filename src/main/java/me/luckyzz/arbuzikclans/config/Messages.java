@@ -70,6 +70,7 @@ public enum Messages implements MessagePath {
     CLAN_REGION_EXISTS("clan.region.exists", "&cКлановый регион уже существует!"),
     CLAN_REGION_NOT_EXISTS("clan.region.notExists", "&cКлановый регион не существует!"),
     CLAN_REGION_BREAK("clan.region.break", "&7[&cКлан&7] &c%rank% &c%name% &fубрал регион клана!"),
+    CLAN_REGION_INTERSECTS("clan.region.intersects", "&cВы не можете установить тут регион, т.к. он пересекает чужой регион!"),
     CLAN_INVITE_ALREADY("clan.invite.already", "&cВы уже пригласили этого игрока!"),
     CLAN_INVITE_ALREADY_CLAN("clan.invite.alreadyClan", "&cЭтот игрок уже состоит в клане!"),
     CLAN_INVITE_ACCEPT_ALREADY_CLAN("clan.invite.accept.alreadyClan", "&cВы уже состоите в клане!"),
@@ -105,7 +106,8 @@ public enum Messages implements MessagePath {
     NOT_ONLINE("notOnline", "&cЭтот игрок не онлайн!"),
     NOT_INVITE("clan.invite.notInvite", "&cВас никто не приглашал в клан!"),
     QUEST_COINS_GAVE("clan.quests.gaveCoins", "&7[&cКлан&7] &c%rank% &c%name% &fдобавил в козну &c%amount% коинов &fза счет выполнения квеста! (Всего &c%sum_amount% коинов&f)"),
-    CLAN_RENAME_USAGE("clan.rename.usage", "&cИспользуй - /clan rename [Название]");
+    CLAN_RENAME_USAGE("clan.rename.usage", "&cИспользуй - /clan rename [Название]"),
+    CLAN_REGION_SETTING("clan.region.setting", "&cИдет установка региона... Ожидайте!");
 
     private final String path, defaultValue;
 

@@ -1,16 +1,13 @@
 package me.luckyzz.arbuzikclans.clan.member.quest;
 
+import me.luckkyyz.luckapi.api.Typable;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 
-public interface MemberQuest {
+public interface MemberQuest extends Typable<QuestType> {
 
     default boolean isTarget(Object value) {
         return getTarget().equals(value);
-    }
-
-    default QuestType getType() {
-        return getTargetName().startsWith("Block") ? QuestType.BREAK_BLOCKS : getTargetName().startsWith("Entity ") ? QuestType.KILL : null;
     }
 
     Object getTarget();
@@ -28,6 +25,8 @@ public interface MemberQuest {
     }
 
     ClanMember getMember();
+
+    int getCoins();
 
     int getNeedCount();
 

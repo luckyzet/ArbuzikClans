@@ -1,11 +1,16 @@
 package me.luckyzz.arbuzikclans.clan.impl;
 
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckkyyz.luckapi.util.location.LocationSerializers;
 import me.luckkyyz.luckapi.util.math.CuboidRegion;
 import me.luckkyyz.luckapi.util.player.PlayerUtils;
 import me.luckyzz.arbuzikclans.clan.Clan;
+import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
@@ -16,30 +21,37 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 class ClanRegionImpl implements ClanRegion {
 
     static NamespacedKey TAG_KEY;
+
+    private final ClanService clanService;
     private final ClanConfig config;
     private final MessageConfig<Messages> messageConfig;
     private final QueryExecutors executors;
     private final List<ClanMember> accessChestWhitelist;
     private final List<ClanMember> accessBlocksWhitelist;
+
     private Clan clan;
     private CuboidRegion cuboid;
     private Location center;
     private boolean accessChests;
     private boolean accessBlocks;
 
-    ClanRegionImpl(ClanConfig config, MessageConfig<Messages> messageConfig, QueryExecutors executors, Location center, boolean accessChests, boolean accessBlocks, List<ClanMember> accessChestWhitelist, List<ClanMember> accessBlocksWhitelist) {
+    ClanRegionImpl(ClanService clanService, ClanConfig config, MessageConfig<Messages> messageConfig, QueryExecutors executors, Location center, boolean accessChests, boolean accessBlocks, List<ClanMember> accessChestWhitelist, List<ClanMember> accessBlocksWhitelist) {
+        this.clanService = clanService;
         this.config = config;
         this.messageConfig = messageConfig;
         this.executors = executors;
@@ -74,9 +86,9 @@ class ClanRegionImpl implements ClanRegion {
         return center;
     }
 
-    private void calculateCuboid() {
+    private CuboidRegion calculateCuboid(Location center) {
         if(center == null) {
-            return;
+            return cuboid;
         }
 
         World world = center.getWorld();
@@ -92,7 +104,11 @@ class ClanRegionImpl implements ClanRegion {
         int maxZ = center.getBlockZ() + size;
         Location maxLocation = new Location(world, maxX, maxY, maxZ);
 
-        cuboid = new CuboidRegion(minLocation, maxLocation);
+        return new CuboidRegion(minLocation, maxLocation);
+    }
+
+    private void calculateCuboid() {
+        cuboid = calculateCuboid(center);
     }
 
     @Override
@@ -116,27 +132,50 @@ class ClanRegionImpl implements ClanRegion {
     }
 
     @Override
-    public boolean setCenterLocation(Location location, ClanMember member) {
+    public CompletableFuture<Boolean> setCenterLocation(Location location, ClanMember member) {
+
         if (!member.hasPossibility(RankPossibility.REGION_CREATE)) {
             member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_CANNOT_CREATE).send(player));
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
         if (isRegionExists()) {
             member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_CANNOT_CREATE).send(player));
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
-        this.center = location;
-        calculateCuboid();
+        member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_SETTING).send(player));
 
-        executors.async().update("UPDATE clanRegions SET center = ? WHERE clan = ?", LocationSerializers.string().serialize(center), clan.getId());
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                CuboidRegion cuboidRegion = calculateCuboid(location);
 
-        member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_CREATE_SUCCESS_EXECUTOR).send(player));
-        clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_REGION_CREATE_SUCCESS_LOCAL)
-                .placeholder("%rank%", member.getRank().getPrefix())
-                .placeholder("%name%", member.getName()));
+                RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(location.getWorld()));
+                if (regionManager != null) {
+                    for (Block block : cuboidRegion.getBlocks()) {
+                        if (!regionManager.getApplicableRegions(BlockVector3.at(block.getX(), block.getY(), block.getZ())).getRegions().isEmpty() ||
+                                clanService.getAllClans().stream().anyMatch(clan1 -> clan1.getRegion().isInRegion(block.getLocation()))) {
+                            member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_INTERSECTS).send(player));
+                            return false;
+                        }
+                    }
+                }
 
-        return true;
+                this.center = location;
+                calculateCuboid();
+
+                executors.async().update("UPDATE clanRegions SET center = ? WHERE clan = ?", LocationSerializers.string().serialize(center), clan.getId());
+
+                member.apply(player -> messageConfig.getMessage(Messages.CLAN_REGION_CREATE_SUCCESS_EXECUTOR).send(player));
+                clan.send(messageConfig.getAdaptiveMessage(Messages.CLAN_REGION_CREATE_SUCCESS_LOCAL)
+                        .placeholder("%rank%", member.getRank().getPrefix())
+                        .placeholder("%name%", member.getName()));
+
+                return true;
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                return false;
+            }
+        });
     }
 
     @Override

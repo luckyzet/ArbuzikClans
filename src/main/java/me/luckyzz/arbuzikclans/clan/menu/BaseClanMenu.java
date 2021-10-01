@@ -184,7 +184,23 @@ public class BaseClanMenu extends AbstractClanMenu {
                 }
             }));
 
-            patternFillingStrategy.setPattern("--B--C--D", "A--------", "--E-F-G-I");
+            if(!region.isRegionExists()) {
+                patternFillingStrategy.withButton('H', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.STICK)
+                        .setDisplay(menuText.getMessage(MenuText.BASE_MENU_STICK_NAME).toRawText())
+                        .setLore(Arrays.asList(placeholdersInfo.apply(menuText.getMessage(MenuText.BASE_MENU_STICK_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored1, int ignored2) {
+                        player.closeInventory();
+                        region.giveItem(member);
+                    }
+                }));
+
+                patternFillingStrategy.setPattern("A-B--C--D", "---------", "H-E-F-G-I");
+            } else {
+                patternFillingStrategy.setPattern("--B--C--D", "A--------", "--E-F-G-I");
+            }
         } else {
             patternFillingStrategy.setPattern("A--------", "--B--C--D", "---------");
         }

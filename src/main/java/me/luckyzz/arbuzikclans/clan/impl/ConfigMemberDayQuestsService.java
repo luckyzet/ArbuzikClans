@@ -78,14 +78,15 @@ public class ConfigMemberDayQuestsService implements MemberDayQuestsService {
                     int minCountQuest = current.getInt("minCount");
                     int maxCountQuest = current.getInt("maxCount");
                     String display = current.getString("name");
+                    int coins = current.getInt("coins", 1);
                     if (type == QuestType.KILL) {
                         EntityType target = EntityType.valueOf(targetString);
-                        quests.addQuest(new MemberDayQuestImpl(messageConfig, executors, type, target, display, minCountQuest, maxCountQuest));
+                        quests.addQuest(new MemberDayQuestImpl(messageConfig, executors, type, target, display, minCountQuest, maxCountQuest, coins));
                         return;
                     }
                     if (type == QuestType.BREAK_BLOCKS) {
                         Material target = Material.getMaterial(targetString);
-                        quests.addQuest(new MemberDayQuestImpl(messageConfig, executors, type, target, display, minCountQuest, maxCountQuest));
+                        quests.addQuest(new MemberDayQuestImpl(messageConfig, executors, type, target, display, minCountQuest, maxCountQuest, coins));
                     }
                 });
 

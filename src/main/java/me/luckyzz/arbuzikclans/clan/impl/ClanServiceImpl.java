@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
+import me.luckkyyz.luckapi.event.QuickEventListener;
 import me.luckkyyz.luckapi.provider.economy.EconomicUser;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
@@ -16,6 +17,7 @@ import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuest;
+import me.luckyzz.arbuzikclans.clan.member.quest.QuestType;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRankService;
 import me.luckyzz.arbuzikclans.clan.member.rank.NotUsedClanRank;
@@ -32,9 +34,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -79,6 +85,7 @@ public class ClanServiceImpl implements ClanService {
                 ")");
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanMembers` (" +
                 "`name` VARCHAR(64) NOT NULL PRIMARY KEY, " +
+                "`lastJoin` VARCHAR(128) NOT NULL, " +
                 "`clan` INT NOT NULL, " +
                 "`rank` INT NOT NULL, " +
                 "`questsCompleted` INT NOT NULL" +
@@ -104,6 +111,8 @@ public class ClanServiceImpl implements ClanService {
         executors.sync().update("CREATE TABLE IF NOT EXISTS `clanQuests` (" +
                 "`name` VARCHAR(64) NOT NULL, " +
                 "`display` VARCHAR(64) NOT NULL, " +
+                "`type` VARCHAR(32) NOT NULL, " +
+                "`coins` INT NOT NULL, " +
                 "`target` VARCHAR(64) NOT NULL, " +
                 "`count` INT NOT NULL, " +
                 "`needCount` INT NOT NULL" +
@@ -114,6 +123,29 @@ public class ClanServiceImpl implements ClanService {
                 ")");
 
         reload();
+
+        QuickEventListener.newListener().event(PlayerQuitEvent.class, event -> {
+            Player player = event.getPlayer();
+            ClanMember member = getClanMemberPlayer(player);
+            if(member == null) {
+                return;
+            }
+            member.updateLastJoinTime();
+        }).event(PlayerKickEvent.class, event -> {
+            Player player = event.getPlayer();
+            ClanMember member = getClanMemberPlayer(player);
+            if(member == null) {
+                return;
+            }
+            member.updateLastJoinTime();
+        }).event(PlayerJoinEvent.class, event -> {
+            Player player = event.getPlayer();
+            ClanMember member = getClanMemberPlayer(player);
+            if(member == null) {
+                return;
+            }
+            member.updateLastJoinTime();
+        }).register(plugin);
     }
 
     @Override
@@ -125,19 +157,21 @@ public class ClanServiceImpl implements ClanService {
             executors.sync().result("SELECT * FROM clanQuests", result -> {
                 while (result.next()) {
                     String name = result.getString("name");
+                    QuestType type = QuestType.fromString(result.getString("type"));
+                    int coins = result.getInt("coins");
                     String targetString = result.getString("target");
                     String display = result.getString("display");
                     int count = result.getInt("count");
                     int needCount = result.getInt("needCount");
 
-                    if(targetString.split(" ")[0].equals("Entity")) {
-                        EntityType entityType = EntityType.valueOf(targetString.split(" ")[1]);
-                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, display, entityType, needCount, count));
+                    if(type == QuestType.KILL) {
+                        EntityType entityType = EntityType.valueOf(targetString);
+                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, display, type, entityType, coins, needCount, count));
                         continue;
                     }
-                    if(targetString.split(" ")[0].equals("Block")) {
-                        Material material = Material.valueOf(targetString.split(" ")[1]);
-                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, display, material, needCount, count));
+                    if(type == QuestType.BREAK_BLOCKS) {
+                        Material material = Material.valueOf(targetString);
+                        memberQuests.put(name, new MemberQuestImpl(executors, messageConfig, display, type, material, coins, needCount, count));
                     }
                 }
             });
@@ -182,11 +216,12 @@ public class ClanServiceImpl implements ClanService {
                             String memberName = result.getString("name");
                             int rankIndex = result.getInt("rank");
                             int questsCompleted = result.getInt("questsCompleted");
+                            LocalDateTime lastJoin = DateFormat.dateTimeFormatter().parse(result.getString("lastJoin"), FormatDate.DATE_TIME);
                             ClanRank rank = ranks.getRank(rankIndex);
                             if(rank == null) {
                                 continue;
                             }
-                            ClanMember member = new ClanMemberImpl(plugin, executors, messageConfig, memberName, rank, memberQuests.get(memberName), questsCompleted);
+                            ClanMember member = new ClanMemberImpl(plugin, executors, messageConfig, memberName, lastJoin, rank, memberQuests.get(memberName), questsCompleted);
                             memberMap.put(member.getName(), member);
                         }
                     }, id);
@@ -210,10 +245,10 @@ public class ClanServiceImpl implements ClanService {
                                     .map(memberMap::get)
                                     .collect(Collectors.toList());
 
-                            region.set(new ClanRegionImpl(config, messageConfig, executors, location, accessChests, accessBlocks, accessChestsWhitelist, accessBlocksWhitelist));
+                            region.set(new ClanRegionImpl(this, config, messageConfig, executors, location, accessChests, accessBlocks, accessChestsWhitelist, accessBlocksWhitelist));
                             return;
                         }
-                        region.set(new ClanRegionImpl(config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>()));
+                        region.set(new ClanRegionImpl(this, config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>()));
                     }, id);
 
                     AtomicReference<ClanChatImpl> chat = new AtomicReference<>();
@@ -323,7 +358,7 @@ public class ClanServiceImpl implements ClanService {
 
         ClanRanksImpl ranks = new ClanRanksImpl(executors, new HashMap<>());
 
-        ClanRegionImpl region = new ClanRegionImpl(config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>());
+        ClanRegionImpl region = new ClanRegionImpl(this, config, messageConfig, executors, null, false, false, new ArrayList<>(), new ArrayList<>());
         ClanChatImpl chat = new ClanChatImpl(messageConfig, executors, true, new HashSet<>());
 
         Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat);

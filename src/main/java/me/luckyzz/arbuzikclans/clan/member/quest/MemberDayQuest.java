@@ -19,6 +19,8 @@ public interface MemberDayQuest extends Typable<QuestType> {
 
     int getMaxCount();
 
+    int getCoins();
+
     MemberQuest toMemberQuest(int count, ClanMember member);
 
     default MemberQuest toMemberQuest(ClanMember member) {

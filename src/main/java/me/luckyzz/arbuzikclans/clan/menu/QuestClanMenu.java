@@ -38,6 +38,7 @@ public class QuestClanMenu extends AbstractClanMenu {
                 .placeholder("%amount%", quest.getNeedCount())
                 .placeholder("%need%", quest.getNeedCount() - quest.getCount())
                 .placeholder("%state%", quest.isFinished() ? "Выполнен" : quest.getCount() >= 1 ? "В процессе" : "Не выполнен")
+                .placeholder("%reward_coins%", quest.getCoins())
                 .toRawText();
 
         char[] symbols = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', '3', 'r', 's', 't', 'u'};
@@ -61,7 +62,7 @@ public class QuestClanMenu extends AbstractClanMenu {
             Material material = Material.ZOMBIE_HEAD;
 
             if (quest.getType() == QuestType.BREAK_BLOCKS) {
-                String blockName = quest.getTargetName().split(" ")[1];
+                String blockName = quest.getTargetName();
                 material = Material.getMaterial(blockName);
             }
 

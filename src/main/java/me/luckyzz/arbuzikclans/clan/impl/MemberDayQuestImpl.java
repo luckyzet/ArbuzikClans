@@ -18,9 +18,9 @@ class MemberDayQuestImpl implements MemberDayQuest {
     private final QuestType type;
     private final Object target;
     private final String display;
-    private final int minCount, maxCount;
+    private final int minCount, maxCount, coins;
 
-    MemberDayQuestImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, QuestType type, Object target, String display, int minCount, int maxCount) {
+    MemberDayQuestImpl(MessageConfig<Messages> messageConfig, QueryExecutors executors, QuestType type, Object target, String display, int minCount, int maxCount, int coins) {
         this.messageConfig = messageConfig;
         this.executors = executors;
         this.type = type;
@@ -28,6 +28,7 @@ class MemberDayQuestImpl implements MemberDayQuest {
         this.display = display;
         this.minCount = minCount;
         this.maxCount = maxCount;
+        this.coins = coins;
     }
 
     @Override
@@ -56,8 +57,13 @@ class MemberDayQuestImpl implements MemberDayQuest {
     }
 
     @Override
+    public int getCoins() {
+        return coins;
+    }
+
+    @Override
     public MemberQuest toMemberQuest(int count, ClanMember member) {
-        return new MemberQuestImpl(member, executors, messageConfig, display, target, maxCount, count);
+        return new MemberQuestImpl(member, executors, messageConfig, display, type, target, coins, count, 0);
     }
 
     @Override
@@ -65,27 +71,11 @@ class MemberDayQuestImpl implements MemberDayQuest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MemberDayQuestImpl that = (MemberDayQuestImpl) o;
-        return new EqualsBuilder()
-                .append(minCount, that.minCount)
-                .append(maxCount, that.maxCount)
-                .append(messageConfig, that.messageConfig)
-                .append(executors, that.executors)
-                .append(type, that.type)
-                .append(target, that.target)
-                .append(display, that.display)
-                .isEquals();
+        return new EqualsBuilder().append(minCount, that.minCount).append(maxCount, that.maxCount).append(coins, that.coins).append(messageConfig, that.messageConfig).append(executors, that.executors).append(type, that.type).append(target, that.target).append(display, that.display).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(messageConfig)
-                .append(executors)
-                .append(type)
-                .append(target)
-                .append(display)
-                .append(minCount)
-                .append(maxCount)
-                .toHashCode();
+        return new HashCodeBuilder(17, 37).append(messageConfig).append(executors).append(type).append(target).append(display).append(minCount).append(maxCount).append(coins).toHashCode();
     }
 }

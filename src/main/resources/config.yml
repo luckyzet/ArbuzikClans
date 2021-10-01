@@ -75,18 +75,21 @@ quests:
         minCount: 1
         maxCount: 5
         name: "Убить зомби %amount%"
+        coins: 1
       second:
         type: KILL
         target: ZOMBIE
         minCount: 3
         maxCount: 8
         name: "Убить зомби %amount%"
+        coins: 3
       third:
         type: BREAK_BLOCKS
         target: DIAMOND_ORE
         minCount: 1
         maxCount: 5
         name: "Сломать алмазы %amount%"
+        coins: 5
   normal:
     minCount: 1
     maxCount: 2
@@ -97,18 +100,21 @@ quests:
         minCount: 3
         maxCount: 8
         name: "Убить зомби %amount%"
+        coins: 2
       second:
         type: KILL
         target: ZOMBIE
         minCount: 5
         maxCount: 10
         name: "Убить зомби %amount%"
+        coins: 3
       third:
         type: BREAK_BLOCKS
         target: DIAMOND_ORE
         minCount: 5
         maxCount: 15
         name: "Сломать алмазы %amount%"
+        coins: 7
   high:
     minCount: 1
     maxCount: 2
@@ -119,18 +125,21 @@ quests:
         minCount: 1
         maxCount: 3
         name: "Убить зомби %amount%"
+        coins: 9
       second:
         type: KILL
         target: ZOMBIE
         minCount: 10
         maxCount: 21
         name: "Убить зомби %amount%"
+        coins: 11
       third:
         type: BREAK_BLOCKS
         target: DIAMOND_ORE
         minCount: 5
         maxCount: 35
         name: "Сломать алмазы %amount%"
+        coins: 31
 
 upgrades:
   1:

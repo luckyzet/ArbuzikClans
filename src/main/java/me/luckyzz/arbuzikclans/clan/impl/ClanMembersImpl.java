@@ -2,6 +2,7 @@ package me.luckyzz.arbuzikclans.clan.impl;
 
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.QueryExecutors;
+import me.luckkyyz.luckapi.util.date.FormatDate;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
@@ -74,15 +75,12 @@ class ClanMembersImpl implements ClanMembers {
     public ClanMember addMemberSilently(Player player, RankRole role) {
         ClanRank rank = clan.getRanks().getRank(role);
 
-        ClanMemberImpl newMember = new ClanMemberImpl(plugin, executors, messageConfig, player.getName(),
-                rank,
-                new ArrayList<>(),
-                0);
+        ClanMemberImpl newMember = new ClanMemberImpl(plugin, executors, messageConfig, player.getName(), rank, new ArrayList<>(), 0);
         newMember.setClan(clan);
         newMember.changeQuestsSilently(questsService.getQuests(newMember).generateRandom(newMember));
 
         memberMap.put(newMember.getName(), newMember);
-        executors.async().update("INSERT INTO clanMembers VALUES (?, ?, ?, ?)", newMember.getName(), newMember.getClan().getId(),
+        executors.async().update("INSERT INTO clanMembers VALUES (?, ?, ?, ?, ?)", newMember.getName(), newMember.getLastJoinTime(FormatDate.DATE_TIME), newMember.getClan().getId(),
                 newMember.getRank().getIndex(), newMember.getQuestsCompleted());
 
         return newMember;
