@@ -41,4 +41,6 @@ public interface ClanService extends Service {
 
     void createClan(Player player, String name);
 
+    void removeClan(Clan clan);
+
 }

@@ -15,7 +15,6 @@ import me.luckkyyz.luckapi.util.location.LocationSerializers;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMute;
-import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMutes;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberDayQuestsService;
 import me.luckyzz.arbuzikclans.clan.member.quest.MemberQuest;
@@ -290,7 +289,7 @@ public class ClanServiceImpl implements ClanService {
 
                     ClanRegionImpl clanRegion = region.get();
                     ClanChatImpl clanChat = chat.get();
-                    Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, date, name, members, upgrades, ranks, money, coins, clanRegion, clanChat, mutes);
+                    Clan clan = new ClanImpl(this, config, messageConfig, economyProvider, executors, formatNameCheck, id, date, name, members, upgrades, ranks, money, coins, clanRegion, clanChat, mutes);
                     members.setClan(clan);
                     upgrades.setClan(clan);
                     ranks.setClan(clan);
@@ -384,7 +383,7 @@ public class ClanServiceImpl implements ClanService {
 
         ClanChatMutesImpl mutes = new ClanChatMutesImpl(executors, messageConfig, new HashMap<>());
 
-        Clan clan = new ClanImpl(config, messageConfig, economyProvider, executors, formatNameCheck, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat, mutes);
+        Clan clan = new ClanImpl(this, config, messageConfig, economyProvider, executors, formatNameCheck, id, dateCreated, name, members, upgrades, ranks, money, coins, region, chat, mutes);
 
         upgrades.setClan(clan);
         ranks.setClan(clan);
@@ -406,6 +405,11 @@ public class ClanServiceImpl implements ClanService {
 
         clan.getRegion().giveItem(member);
         messageConfig.getAdaptiveMessage(Messages.CLAN_CREATE_SUCCESS).placeholder("%name%", clan.getName()).send(player);
+    }
+
+    @Override
+    public void removeClan(Clan clan) {
+        clans.remove(clan);
     }
 
     @Override

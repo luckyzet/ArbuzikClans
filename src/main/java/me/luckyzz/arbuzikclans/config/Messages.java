@@ -20,7 +20,13 @@ public enum Messages implements MessagePath {
     CLAN_CREATE_SUCCESS("clan.create.success", "&fВы успешно создали клан &c%name%&f!"),
     CLAN_HELP("clan.help", Arrays.asList(
             "&7[&cArbuzik&fClans&7] &7&l| &fПомощь по командам:",
-            "&c/clan create [Название] &7&l- &fСоздать клан"
+            "&c/clan create [Название] &7&l- &fСоздать клан",
+            "&c/clan accept, deny &7&l- &fПринять/отказаться запрос в клан",
+            "&c/clan region blocks/chests [Никнейм] &7&l- &fРазрешить/запретить игроку доступ к сундукам/блокам в регионе",
+            "&c/clan invite [Никнейм] &7&l- &fПригласить игрока в клан",
+            "&c/clan rename [Название] &7&l- &fПереименовать клан",
+            "&c/clan mute [Ник] [Время(2h,1m,3s)] [Причина] &7&l- &fЗамутить игрока в клановом чате",
+            "&c/clan money take/add [Кол-во] &7&l- &fДобавить/взять деньги из казны"
     )),
     ALREADY_CLAN("alreadyInClan", "&cВы уже состоите в клане!"),
     ALREADY_CLAN_OTHER("alreadyInClanOther", "&cИгрок %name% уже состоит в клане!"),
@@ -113,7 +119,19 @@ public enum Messages implements MessagePath {
     NOT_YOUR_CLAN("notYourClan", "&cЭтот человек не находится в Вашем клане!"),
 
     CLAN_MUTE_USAGE("clan.mute.usage", "&cИспользуй - /clan mute [Ник] [Время(2h,1m,3s)] [Причина]"),
-    CLAN_MUTE_DURATION_ZERO("clan.mute.durationZero", "&cВремя мута не может быть нулём! (Возможно неправильный формат, пример, 3h,2m)");
+    CLAN_MUTE_DURATION_ZERO("clan.mute.durationZero", "&cВремя мута не может быть нулём! (Возможно неправильный формат, пример, 3h,2m)"),
+
+    CLAN_DISBAND_SUCCESS("clan.disband.success.executor", "&fВы успешно расформировали клан!"),
+    CLAN_DISBAND_SUCCESS_LOCAL("clan.disband.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fрасформировал клан!"),
+
+    CLAN_MONEY_USAGE("clan.money.usage", "&cИспользуй - /clan money take/add [Кол-во]"),
+    CLAN_MONEY_COUNT_NUMBER("clan.money.countNumber", "&cКоличество не является числом!"),
+
+    TAKE_NOT_ENOUGH("clan.money.take.notEnough", "&cНедостаточно средств на счету клана! (%money%)"),
+    TAKE_SUCCESS("clan.money.take.success", "&fВы успешно взяли из казны &c%amount%"),
+    TAKE_SUCCESS_LOCAL("clan.money.take.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fвзял из казны &c%amount%"),
+    ADD_SUCCESS("clan.money.add.success", "&fВы успешно положили в казну &c%amount%"),
+    ADD_SUCCESS_LOCAL("clan.money.add.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fположил в казну &c%amount%"),;
 
     private final String path, defaultValue;
 

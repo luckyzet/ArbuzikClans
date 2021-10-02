@@ -7,6 +7,7 @@ import me.luckkyyz.luckapi.provider.economy.EconomicUser;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckyzz.arbuzikclans.clan.Clan;
+import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
 import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMutes;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
@@ -24,9 +25,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
 import java.time.LocalDate;
+import java.util.concurrent.CompletableFuture;
 
 class ClanImpl implements Clan {
 
+    private final ClanService clanService;
     private final ClanConfig config;
     private final MessageConfig<Messages> messageConfig;
     private final EconomyProvider economyProvider;
@@ -44,7 +47,8 @@ class ClanImpl implements Clan {
     private String name;
     private int money, coins;
 
-    ClanImpl(ClanConfig config, MessageConfig<Messages> messageConfig, EconomyProvider economyProvider, QueryExecutors executors, FormatNameCheck formatNameCheck, int id, LocalDate dateCreated, String name, ClanMembers members, ClanUpgrades upgrades, ClanRanks ranks, int money, int coins, ClanRegion region, ClanChat chat, ClanChatMutes mutes) {
+    ClanImpl(ClanService clanService, ClanConfig config, MessageConfig<Messages> messageConfig, EconomyProvider economyProvider, QueryExecutors executors, FormatNameCheck formatNameCheck, int id, LocalDate dateCreated, String name, ClanMembers members, ClanUpgrades upgrades, ClanRanks ranks, int money, int coins, ClanRegion region, ClanChat chat, ClanChatMutes mutes) {
+        this.clanService = clanService;
         this.config = config;
         this.messageConfig = messageConfig;
         this.economyProvider = economyProvider;
@@ -148,6 +152,69 @@ class ClanImpl implements Clan {
     }
 
     @Override
+    public void takeMoney(int count, ClanMember member) {
+        if(!member.hasPossibility(RankPossibility.MONEY_TAKE)) {
+            member.apply(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
+            return;
+        }
+        if(count > money) {
+            member.apply(player -> messageConfig.getAdaptiveMessage(Messages.TAKE_NOT_ENOUGH).placeholder("%money%", money).send(player));
+            return;
+        }
+
+        if(!member.isOnline()) {
+            member.apply(player -> messageConfig.getMessage(Messages.SOMETHING_WENT_WRONG).send(player));
+            return;
+        }
+        Player player = member.getPlayer();
+        EconomicUser economicUser = economyProvider.getUser(player);
+        economicUser.changeBalance(count);
+
+        money -= count;
+        executors.async().update("UPDATE clans SET money = ? WHERE id = ?", money, id);
+
+        messageConfig.getAdaptiveMessage(Messages.TAKE_SUCCESS).placeholder("%amount%", count).send(player);
+        send(messageConfig.getAdaptiveMessage(Messages.TAKE_SUCCESS_LOCAL)
+                .placeholder("%rank%", member.getRank().getPrefix())
+                .placeholder("%name%", member.getName())
+                .placeholder("%amount%", count));
+    }
+
+    @Override
+    public void addMoney(int count, ClanMember member) {
+        if(!member.hasPossibility(RankPossibility.MONEY_ADD)) {
+            member.apply(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
+            return;
+        }
+
+        if(!member.isOnline()) {
+            member.apply(player -> messageConfig.getMessage(Messages.SOMETHING_WENT_WRONG).send(player));
+            return;
+        }
+        Player player = member.getPlayer();
+
+        EconomicUser economicUser = economyProvider.getUser(player);
+        if (!economicUser.hasBalance(count)) {
+            messageConfig.getAdaptiveMessage(Messages.NOT_ENOUGH_MONEY)
+                    .placeholder("%balance%", (int) economicUser.getBalance())
+                    .placeholder("%need_balance%", count)
+                    .placeholder("%need%", count - (int) economicUser.getBalance())
+                    .send(player);
+            return;
+        }
+        economicUser.changeBalance(-count);
+
+        money += count;
+        executors.async().update("UPDATE clans SET money = ? WHERE id = ?", money, id);
+
+        messageConfig.getAdaptiveMessage(Messages.ADD_SUCCESS).placeholder("%amount%", count).send(player);
+        send(messageConfig.getAdaptiveMessage(Messages.ADD_SUCCESS_LOCAL)
+                .placeholder("%rank%", member.getRank().getPrefix())
+                .placeholder("%name%", member.getName())
+                .placeholder("%amount%", count));
+    }
+
+    @Override
     public int getCoins() {
         return coins;
     }
@@ -190,19 +257,43 @@ class ClanImpl implements Clan {
     }
 
     @Override
+    public void disband(ClanMember member) {
+        if(!member.hasPossibility(RankPossibility.DISBAND)) {
+            member.apply(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
+            return;
+        }
+
+        member.apply(player -> messageConfig.getMessage(Messages.CLAN_DISBAND_SUCCESS).send(player));
+        send(messageConfig.getAdaptiveMessage(Messages.CLAN_DISBAND_SUCCESS_LOCAL)
+                .placeholder("%rank%", member.getRank().getPrefix())
+                .placeholder("%name%", member.getName()));
+
+        clanService.removeClan(this);
+
+        CompletableFuture.runAsync(() -> {
+            executors.sync().update("DELETE FROM clans WHERE id = ?", id);
+            executors.sync().update("DELETE FROM clanMembers WHERE clan = ?", id);
+            executors.sync().update("DELETE FROM clanRegions WHERE clan = ?", id);
+            executors.sync().update("DELETE FROM clanChats WHERE clan = ?", id);
+            executors.sync().update("DELETE FROM clanRanks WHERE clan = ?", id);
+
+            members.getAllMembers().forEach(member1 -> executors.sync().update("DELETE FROM clanQuests WHERE name = ?", member1.getName()));
+
+            executors.sync().update("DELETE FROM clanUpgrades WHERE clan = ?", id);
+            executors.sync().update("DELETE FROM clanMutes WHERE clan = ?", id);
+        });
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClanImpl clan = (ClanImpl) o;
-        return new EqualsBuilder()
-                .append(id, clan.id)
-                .isEquals();
+        return new EqualsBuilder().append(id, clan.id).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(id)
-                .toHashCode();
+        return new HashCodeBuilder(17, 37).append(id).toHashCode();
     }
 }

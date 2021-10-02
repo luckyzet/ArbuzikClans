@@ -8,7 +8,7 @@ public final class ConstantRankPossibilities {
 
     public static final RankPossibilities OWNER = new RankPossibilities(RankPossibility.ALL);
 
-    public static final RankPossibilities VICE = new RankPossibilities();
+    public static final RankPossibilities VICE = RankPossibilities.allExcept(RankPossibility.DISBAND, RankPossibility.MONEY_TAKE);
 
     public static final RankPossibilities DEFAULT = new RankPossibilities();
 

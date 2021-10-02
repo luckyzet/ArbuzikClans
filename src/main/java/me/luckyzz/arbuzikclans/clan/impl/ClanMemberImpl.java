@@ -90,8 +90,7 @@ class ClanMemberImpl implements ClanMember {
             apply(player -> messageConfig.getMessage(Messages.YOURSELF).send(player));
             return;
         }
-        RankRole role = rank.getRole();
-        if (!member.hasPossibility(RankPossibility.RANK_GIVE) || (role.isSingle() && !clan.getMembers().getMembers(rank.getRole()).isEmpty())) {
+        if (this.rank.getRole() == RankRole.OWNER || !member.hasPossibility(RankPossibility.RANK_GIVE)) {
             member.apply(player -> messageConfig.getMessage(Messages.CLAN_RANK_CANNOT_GIVE).send(player));
             return;
         }

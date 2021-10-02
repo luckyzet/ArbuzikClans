@@ -6,9 +6,11 @@ public enum MenuText implements MessagePath {
 
     MAIN_MENU_TITLE("mainMenu.title", "&fКлан &7[&c%name%&7]"),
     MAIN_MENU_COMPASS_NAME("mainMenu.compass.name", "&fКлан [&c%name%&f]"),
-    MAIN_MENU_COMPASS_LORE("mainMenu.compass.lore", "&fВы состоите в этом клане!\n&fВаш ранг: &c%rank%\n\n&fНазвание: &c%name%\n&fСоздан: &c%date%\n&fID: &c%id%\n&fУчастников: &c%members_all%&7/&c%members_max%\n&fОнлайн участников: &c%members_online%&7/&c%members_max%"),
+    MAIN_MENU_COMPASS_LORE("mainMenu.compass.lore", "&fВы состоите в этом клане!\n&fВаш ранг: &c%rank%\n\n&fНазвание: &c%name%\n&fСоздан: &c%date%\n&fID: &c%id%\n&fУчастников: &c%members_all%&7/&c%members_max%\n&fОнлайн участников: &c%members_online%&7/&c%members_max%\n\n&fДенег: &c%money%\n&fКоинов: &c%coins%"),
     MAIN_MENU_BASE_NAME("mainMenu.base.name", "&7Клановая база"),
     MAIN_MENU_BASE_LORE("mainMenu.base.lore", "\n&fИнформация о базе Вашего клана"),
+    MAIN_MENU_BARRIER_NAME("mainMenu.barrier.name", "&7Дизбанд"),
+    MAIN_MENU_BARRIER_LORE("mainMenu.barrier.lore", "\n&fУдалить клан"),
     BASE_MENU_TITLE("baseMenu.title", "&fКлановая база"),
     BACK_BUTTON_NAME("backButton.name", "&7Вернуться обратно"),
     BACK_BUTTON_LORE("backButton.lore", "\n&fВозвращает Вас в предыдущее меню"),

@@ -36,6 +36,10 @@ public interface Clan {
 
     int getMoney();
 
+    void takeMoney(int count, ClanMember member);
+
+    void addMoney(int count, ClanMember member);
+
     int getCoins();
 
     void changeCoinsSilently(int amount);
@@ -53,5 +57,7 @@ public interface Clan {
     default void send(String message) {
         send(new StringMessage(message));
     }
+
+    void disband(ClanMember member);
 
 }

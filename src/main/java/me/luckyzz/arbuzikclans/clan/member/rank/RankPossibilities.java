@@ -2,6 +2,7 @@ package me.luckyzz.arbuzikclans.clan.member.rank;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +21,20 @@ public class RankPossibilities {
 
     public RankPossibilities() {
         this(new HashSet<>());
+    }
+
+    public static RankPossibilities allExcept(RankPossibility... possibilities) {
+        Collection<RankPossibility> except = Arrays.asList(possibilities);
+
+        Set<RankPossibility> rankPossibilities = new HashSet<>();
+        Arrays.stream(possibilities).forEach(possibility -> {
+            if(except.contains(possibility)) {
+                return;
+            }
+            rankPossibilities.add(possibility);
+        });
+
+        return new RankPossibilities(rankPossibilities);
     }
 
     public Collection<RankPossibility> getPossibilities() {

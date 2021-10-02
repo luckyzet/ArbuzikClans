@@ -40,6 +40,9 @@ public class ClanMenuServiceImpl implements ClanMenuService {
         if (type == ClanMenuType.CONFIRM_KICK) {
             return new ConfirmKickClanMenu(messageConfig, menuText, this, inputMessageService, (ClanMember) args[0], (ClanMember) args[1]);
         }
+        if (type == ClanMenuType.CONFIRM_DISBAND) {
+            return new ConfirmDisbandClanMenu(messageConfig, menuText, this, inputMessageService, (ClanMember) args[0]);
+        }
         if (type == ClanMenuType.RANK_GIVE) {
             return new GiveRankClanMenu(messageConfig, menuText, this, inputMessageService, (ClanMember) args[0]);
         }

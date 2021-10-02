@@ -16,7 +16,10 @@ public enum RankPossibility {
     KICK_OTHER,
     UPGRADE,
     REGION_MANAGE,
-    MUTE
-
+    MUTE,
+    DISBAND,
+    MONEY_TAKE,
+    MONEY_ADD,
+    VICE
 
 }

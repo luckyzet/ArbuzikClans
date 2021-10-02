@@ -16,6 +16,7 @@ import me.luckyzz.arbuzikclans.clan.menu.ClanMenuType;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.util.DurationUtil;
 import me.luckyzz.arbuzikclans.util.Permissions;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
@@ -204,6 +205,43 @@ final class ClanCommand {
 
                             muted.getClan().getChatMutes().mute(muted, whoMute, duration.toMillis(), reason.toString().trim());
                         }), "mute", "clanmute"
+                ).addSubCommand("money", ExecutingStrategy.newBuilder()
+                        .subCommandStrategy()
+                        .whenArgumentAbsent(actions.messageSend(Messages.CLAN_HELP))
+                        .whenSubCommandAbsent(actions.messageSend(Messages.NOT_COMMAND))
+                        .addCheck(session -> clanService.hasClan(session.getExecutor().getPlayer()), actions.messageSend(Messages.NOT_CLAN))
+                        .addSubCommand("take", ExecutingStrategy.newBuilder()
+                                .commandStrategy()
+                                .addCheck(ExecutingChecks.argumentsLength(1), actions.messageSend(Messages.CLAN_MONEY_USAGE))
+                                .addCheck(ExecutingChecks.argumentFormat(1, NumberUtils::isNumber), actions.messageSend(Messages.CLAN_MONEY_COUNT_NUMBER))
+                                .addAction((executor, arguments) -> {
+                                    Player player = executor.getPlayer();
+                                    ClanMember member = clanService.getClanMemberPlayer(player);
+                                    if(member == null) {
+                                        messageConfig.getMessage(Messages.NOT_CLAN).send(player);
+                                        return;
+                                    }
+                                    Clan clan = member.getClan();
+                                    clan.takeMoney(Integer.parseInt(arguments.get(1)), member);
+                                })
+                        ).addSubCommand("add", ExecutingStrategy.newBuilder()
+                                .commandStrategy()
+                                .addCheck(ExecutingChecks.argumentsLength(1), actions.messageSend(Messages.CLAN_MONEY_USAGE))
+                                .addCheck(ExecutingChecks.argumentFormat(1, NumberUtils::isNumber), actions.messageSend(Messages.CLAN_MONEY_COUNT_NUMBER))
+                                .addAction((executor, arguments) -> {
+                                    Player player = executor.getPlayer();
+                                    ClanMember member = clanService.getClanMemberPlayer(player);
+                                    if(member == null) {
+                                        messageConfig.getMessage(Messages.NOT_CLAN).send(player);
+                                        return;
+                                    }
+                                    Clan clan = member.getClan();
+                                    clan.addMoney(Integer.parseInt(arguments.get(1)), member);
+                                })
+                        )
+                ).addSubCommand("rank", ExecutingStrategy.newBuilder()
+                        .commandStrategy()
+                        .addCheck(session -> clanService.hasClan(session.getExecutor().getPlayer()), actions.messageSend(Messages.NOT_CLAN))
                 )
         );
 

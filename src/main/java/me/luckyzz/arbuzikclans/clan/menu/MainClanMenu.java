@@ -13,6 +13,7 @@ import me.luckkyyz.luckapi.util.inventory.ChestInventorySize;
 import me.luckkyyz.luckapi.util.itemstack.ItemBuilders;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.config.MenuText;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.bukkit.Material;
@@ -40,9 +41,11 @@ public class MainClanMenu extends AbstractClanMenu {
                 .placeholder("%members_all%", clan.getMembers().getAllMembers().size())
                 .placeholder("%members_max%", clan.getMembers().getMaxMembers())
                 .placeholder("%members_online%", clan.getMembers().getAllMembers().stream().mapToInt(member1 -> member1.isOnline() ? 1 : 0).sum())
+                .placeholder("%money%", clan.getMoney())
+                .placeholder("%coins%", clan.getCoins())
                 .toRawText();
 
-        PatternFillingStrategy<MenuSession> patternFillingStrategy = new PatternFillingStrategy<>().setPattern("----A----", "---D-С-B-", "---------")
+        PatternFillingStrategy<MenuSession> patternFillingStrategy = new PatternFillingStrategy<>().setPattern("I---A----", "-E-D-С-B-", "--F-G-J--")
                 .withButton('A', new MenuButton(ItemBuilders.newBuilder()
                         .setType(Material.COMPASS)
                         .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_COMPASS_NAME)))
@@ -79,6 +82,19 @@ public class MainClanMenu extends AbstractClanMenu {
                         menuService.getMenu(ClanMenuType.QUESTS).openMenu(member);
                     }
                 }));
+
+        if(member.hasPossibility(RankPossibility.DISBAND)) {
+            patternFillingStrategy.withButton('I', new MenuButton(ItemBuilders.newBuilder()
+                    .setType(Material.BARRIER)
+                    .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_BARRIER_NAME)))
+                    .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_BARRIER_LORE)).split("\n")))
+                    .create(), new ClickCallback() {
+                @Override
+                public void processClick(Player player, ClickType ignored2, int ignored3) {
+                    menuService.getMenu(ClanMenuType.CONFIRM_DISBAND, member).openMenu(member);
+                }
+            }));
+        }
 
         member.apply(player -> PreparedMenu.newBuilder()
                 .setSize(ChestInventorySize.THREE_ROWS)

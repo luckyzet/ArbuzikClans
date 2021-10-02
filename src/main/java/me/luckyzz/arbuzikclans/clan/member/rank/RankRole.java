@@ -4,18 +4,24 @@ import me.luckkyyz.luckapi.util.Enums;
 
 public enum RankRole {
 
-    OWNER,
-    VICE,
-    DEFAULT(false);
+    OWNER(true, 3),
+    VICE(true, 2),
+    DEFAULT(false, 1);
 
     private final boolean single;
+    private final int priority;
 
-    RankRole(boolean single) {
+    RankRole(boolean single, int priority) {
         this.single = single;
+        this.priority = priority;
     }
 
-    RankRole() {
-        this.single = true;
+    public boolean isHigher(RankRole role) {
+        return priority >= role.priority;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public boolean isSingle() {

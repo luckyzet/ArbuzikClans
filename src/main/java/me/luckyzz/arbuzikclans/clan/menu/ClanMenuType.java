@@ -8,6 +8,7 @@ public enum ClanMenuType {
     RANK_GIVE,
     RANK_CHANGE,
     CONFIRM_KICK,
+    CONFIRM_DISBAND,
     QUESTS,
     UPGRADE
 
