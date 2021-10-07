@@ -3,6 +3,7 @@ package me.luckyzz.arbuzikclans.clan.menu;
 import me.luckkyyz.luckapi.chat.input.ChatInputMessageService;
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgradeService;
 import me.luckyzz.arbuzikclans.config.MenuText;
 import me.luckyzz.arbuzikclans.config.Messages;
 
@@ -14,13 +15,15 @@ public class ClanMenuServiceImpl implements ClanMenuService {
     private final MessageConfig<Messages> messageConfig;
     private final MessageConfig<MenuText> menuText;
     private final ChatInputMessageService inputMessageService;
+    private final ClanUpgradeService upgradeService;
 
     private final Map<ClanMenuType, ClanMenu> menuMap = new HashMap<>();
 
-    public ClanMenuServiceImpl(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ChatInputMessageService inputMessageService) {
+    public ClanMenuServiceImpl(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ChatInputMessageService inputMessageService, ClanUpgradeService upgradeService) {
         this.messageConfig = messageConfig;
         this.menuText = menuText;
         this.inputMessageService = inputMessageService;
+        this.upgradeService = upgradeService;
         reload();
     }
 
@@ -32,7 +35,7 @@ public class ClanMenuServiceImpl implements ClanMenuService {
         menuMap.put(ClanMenuType.BASE, new BaseClanMenu(messageConfig, menuText, this, inputMessageService));
         menuMap.put(ClanMenuType.MEMBERS, new MemberClanMenu(messageConfig, menuText, this, inputMessageService));
         menuMap.put(ClanMenuType.QUESTS, new QuestClanMenu(messageConfig, menuText, this, inputMessageService));
-        menuMap.put(ClanMenuType.UPGRADE, new UpgradeClanMenu(messageConfig, menuText, this, inputMessageService));
+        menuMap.put(ClanMenuType.UPGRADE, new UpgradeClanMenu(messageConfig, menuText, this, inputMessageService, upgradeService));
     }
 
     @Override

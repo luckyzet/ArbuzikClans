@@ -8,6 +8,7 @@ import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeRequirement;
 import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeType;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Set;
@@ -17,13 +18,15 @@ class ClanUpgradeImpl implements ClanUpgrade {
     private final QueryExecutors executors;
 
     private final int index;
+    private final ItemStack itemStack;
     private final UpgradeType upgradeType;
     private final UpgradeData upgradeData;
     private final Set<UpgradeRequirement> requirements;
 
-    ClanUpgradeImpl(QueryExecutors executors, int index, UpgradeType upgradeType, UpgradeData upgradeData, Set<UpgradeRequirement> requirements) {
+    ClanUpgradeImpl(QueryExecutors executors, int index, ItemStack itemStack, UpgradeType upgradeType, UpgradeData upgradeData, Set<UpgradeRequirement> requirements) {
         this.executors = executors;
         this.index = index;
+        this.itemStack = itemStack;
         this.upgradeType = upgradeType;
         this.upgradeData = upgradeData;
         this.requirements = requirements;
@@ -36,6 +39,11 @@ class ClanUpgradeImpl implements ClanUpgrade {
     @Override
     public int getIndex() {
         return index;
+    }
+
+    @Override
+    public ItemStack getItem() {
+        return itemStack;
     }
 
     @Override
@@ -82,9 +90,6 @@ class ClanUpgradeImpl implements ClanUpgrade {
         ClanUpgradeImpl that = (ClanUpgradeImpl) o;
         return new EqualsBuilder()
                 .append(index, that.index)
-                .append(upgradeType, that.upgradeType)
-                .append(upgradeData, that.upgradeData)
-                .append(requirements, that.requirements)
                 .isEquals();
     }
 
@@ -92,9 +97,6 @@ class ClanUpgradeImpl implements ClanUpgrade {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(index)
-                .append(upgradeType)
-                .append(upgradeData)
-                .append(requirements)
                 .toHashCode();
     }
 }

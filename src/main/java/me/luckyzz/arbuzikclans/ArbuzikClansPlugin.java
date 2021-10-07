@@ -4,9 +4,7 @@ import me.luckkyyz.luckapi.LuckApi;
 import me.luckkyyz.luckapi.chat.input.ChatInputMessageService;
 import me.luckkyyz.luckapi.chat.input.LuckChatInputMessageService;
 import me.luckkyyz.luckapi.config.MessageConfig;
-import me.luckkyyz.luckapi.database.HikariDatabase;
-import me.luckkyyz.luckapi.database.HikariQueryExecutors;
-import me.luckkyyz.luckapi.database.QueryExecutors;
+import me.luckkyyz.luckapi.database.*;
 import me.luckkyyz.luckapi.database.serialize.DatabaseSerializers;
 import me.luckkyyz.luckapi.menu.LuckMenuService;
 import me.luckkyyz.luckapi.menu.MenuService;
@@ -30,6 +28,8 @@ import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
+
+import java.io.File;
 
 @Plugin(name = "ArbuzikClans", version = "0.1.0-SNAPSHOT")
 @Author("luckyzz")
@@ -67,7 +67,10 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         MessageConfig<MenuText> menuText = new MessageConfig<>(this, "menuText", MenuText.values());
         EconomyProvider economyProvider = EconomyProvider.openProvider();
 
-        clanDatabase = DatabaseSerializers.yaml().deserialize(config.getSection("database"));
+        clanDatabase = Database.newBuilder().hikariBuilder()
+                .setType(ConnectionType.H2)
+                .setFile(new File(getDataFolder(), "database.db"))
+                .createDatabase();
         QueryExecutors clanExecutors = new HikariQueryExecutors(this, clanDatabase);
 
         memberDayQuestsService = new ConfigMemberDayQuestsService(config, messageConfig, clanExecutors);
@@ -80,7 +83,7 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         clanInviteService = new ClanInviteServiceImpl(this, clanService, config, messageConfig);
         clanRegionService = new ClanRegionServiceImpl(this, messageConfig, clanService);
 
-        clanMenuService = new ClanMenuServiceImpl(messageConfig, menuText, inputMessageService);
+        clanMenuService = new ClanMenuServiceImpl(messageConfig, menuText, inputMessageService, clanUpgradeService);
 
         new ClanCommand(messageConfig, clanService, clanMenuService, clanInviteService);
     }

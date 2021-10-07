@@ -64,8 +64,14 @@ public enum MenuText implements MessagePath {
     QUEST_MENU_ITEM_LORE("questMenu.item.lore", "\n&fСтатус: &c%state%\n&fОсталось: &c%need% шт.\n&fНаграда: &c%reward_coins%"),
     MAIN_MENU_QUEST_NAME("mainMenu.quest.name", "&7Квесты"),
     MAIN_MENU_QUEST_LORE("mainMenu.quest.lore", "\n&fСписок ваших ежедневных квестов"),
+    MAIN_MENU_UPGRADE_NAME("mainMenu.upgrade.name", "&7Улучшения"),
+    MAIN_MENU_UPGRADE_LORE("mainMenu.upgrade.lore", "\n&fСписок улучшений"),
     BASE_MENU_STICK_NAME("baseMenu.stick.name", "&7Выдать блок региона"),
-    BASE_MENU_STICK_LORE("baseMenu.stick.lore", "\n&fНажмите, для получения блока региона");
+    BASE_MENU_STICK_LORE("baseMenu.stick.lore", "\n&fНажмите, для получения блока региона"),
+    UPGRADE_MENU_ITEM_NAME("upgradeMenu.item.name", "%name%"),
+    UPGRADE_MENU_ITEM_LORE("upgradeMenu.item.lore", ""),
+    UPGRADE_MENU_TITLE("upgradeMenu.title", "&fУлучшения"),
+    ;
 
     private final String path, defaultValue;
 

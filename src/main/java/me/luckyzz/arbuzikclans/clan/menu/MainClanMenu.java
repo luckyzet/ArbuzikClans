@@ -81,6 +81,15 @@ public class MainClanMenu extends AbstractClanMenu {
                     public void processClick(Player player, ClickType ignored2, int ignored3) {
                         menuService.getMenu(ClanMenuType.QUESTS).openMenu(member);
                     }
+                })).withButton('E', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.DIAMOND)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_UPGRADE_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_UPGRADE_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.UPGRADE).openMenu(member);
+                    }
                 }));
 
         if(member.hasPossibility(RankPossibility.DISBAND)) {

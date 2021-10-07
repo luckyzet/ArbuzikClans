@@ -15,15 +15,6 @@ region:
     type: DIAMOND_BLOCK
     display: "&eКлановый регион"
 
-# Настройки подключения к базе данных
-database:
-  type: MYSQL
-  hostname: 127.0.0.1
-  port: 3306
-  database: "common_test"
-  username: "root"
-  password: ""
-
 # Начальное максимальное кол-во участников клана
 maxMembersDefault: 5
 
@@ -143,27 +134,46 @@ quests:
 
 upgrades:
   1:
+    itemMenu:
+      type: PLAYER_HEAD
+      amount: 1
+      display: "&c6 слотов"
     type: MEMBER_SLOTS
+    name: "6 слотов"
     amount: 6
     level: 1
     clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан до 6 слотов!"
     requirements:
       coins: 1
   2:
+    itemMenu:
+      type: PLAYER_HEAD
+      amount: 1
+      display: "&c7 слотов"
     type: MEMBER_SLOTS
     amount: 7
+    name: "7 слотов"
     level: 2
     clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан до 7 слотов!"
     requirements:
       coins: 1
   3:
+    itemMenu:
+      type: PLAYER_HEAD
+      amount: 1
+      display: "&c8 слотов"
     type: MEMBER_SLOTS
     amount: 8
+    name: "8 слотов"
     level: 3
     clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан до 8 слотов!"
     requirements:
       coins: 1
   4:
+    itemMenu:
+      type: DIAMOND
+      amount: 1
+      display: "&cАлмаз из шопа"
     type: ITEM
     requirements:
       coins: 1
@@ -177,6 +187,10 @@ upgrades:
     price: 100
     clanMessage: "&7[&cКланы&7] &c%rank% &c%name% &fулучшил клан, в магазин добавились новые предметы (по средам и пятницам)!"
   5:
+    itemMenu:
+      type: DIAMOND
+      amount: 1
+      display: "&cАлмаз из шопа 2"
     type: ITEM
     requirements:
       coins: 1

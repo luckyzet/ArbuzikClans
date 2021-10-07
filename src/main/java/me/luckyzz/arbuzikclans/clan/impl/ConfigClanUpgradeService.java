@@ -3,6 +3,7 @@ package me.luckyzz.arbuzikclans.clan.impl;
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckkyyz.luckapi.message.Message;
 import me.luckkyyz.luckapi.message.serialize.MessageSerializers;
+import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckkyyz.luckapi.util.itemstack.reader.ItemReaders;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrade;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgradeService;
@@ -44,6 +45,8 @@ public class ConfigClanUpgradeService implements ClanUpgradeService {
                 return;
             }
 
+            ItemStack itemStack = ItemReaders.yaml().read(section.getConfigurationSection("itemMenu")).get();
+
             Set<UpgradeRequirement> requirements = new HashSet<>();
             ConfigurationSection requirementSection = section.getConfigurationSection("requirements");
             if(requirementSection != null) {
@@ -62,12 +65,12 @@ public class ConfigClanUpgradeService implements ClanUpgradeService {
                 int level = section.getInt("level");
                 Message clanMessage = MessageSerializers.yaml().deserialize(section.getRoot(), section.getCurrentPath() + ".clanMessage");
 
-                upgrade = new ClanUpgradeImpl(executors, index, type, new MemberUpgradeData(clanMessage, level, amount), requirements);
+                upgrade = new ClanUpgradeImpl(executors, index, itemStack, type, new MemberUpgradeData(clanMessage, level, amount), requirements);
                 upgrades.put(upgrade.getIndex(), upgrade);
 
             }
             if(type == UpgradeType.ITEM) {
-                ItemStack itemStack = ItemReaders.yaml().read(section.getConfigurationSection("item")).get();
+                ItemStack itemStack2 = ItemReaders.yaml().read(section.getConfigurationSection("item")).get();
                 Set<DayOfWeek> dayOfWeeks = new HashSet<>();
 
                 section.getStringList("daysOfWeek").forEach(key -> dayOfWeeks.add(DayOfWeek.valueOf(key.toUpperCase())));
@@ -75,7 +78,7 @@ public class ConfigClanUpgradeService implements ClanUpgradeService {
                 int price = section.getInt("price");
                 Message clanMessage = MessageSerializers.yaml().deserialize(section.getRoot(), section.getCurrentPath() + ".clanMessage");
 
-                upgrade = new ClanUpgradeImpl(executors, index, type, new ItemShopUpgradeData(clanMessage, itemStack, price, dayOfWeeks), requirements);
+                upgrade = new ClanUpgradeImpl(executors, index, itemStack, type, new ItemShopUpgradeData(clanMessage, itemStack2, price, dayOfWeeks), requirements);
             }
 
             if(upgrade != null) {
