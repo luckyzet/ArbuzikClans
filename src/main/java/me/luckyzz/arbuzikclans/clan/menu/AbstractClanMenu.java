@@ -11,14 +11,12 @@ public abstract class AbstractClanMenu implements ClanMenu {
     protected final MessageConfig<Messages> messageConfig;
     protected final MessageConfig<MenuText> menuText;
     protected final ClanMenuService menuService;
-    protected final ChatInputMessageService inputMessageService;
 
-    protected AbstractClanMenu(ClanMenuType menuType, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService) {
+    protected AbstractClanMenu(ClanMenuType menuType, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService) {
         this.menuType = menuType;
         this.messageConfig = messageConfig;
         this.menuText = menuText;
         this.menuService = menuService;
-        this.inputMessageService = inputMessageService;
     }
 
     @Override

@@ -92,7 +92,7 @@ public enum Messages implements MessagePath {
     CLAN_INVITE_DENY_SUCCESS_EXECUTOR("clan.invite.deny.success.executor", "&fВы успешно отказались от запроса в клан!"),
     CLAN_INVITE_DENY_SUCCESS_TARGET("clan.invite.deny.success.target", "&fИгрок &c%name% &fотказался от вступления в клан!"),
     CLAN_RANK_PREFIX_CHANGE_EXECUTOR("clan.rank.prefix.change.executor", "&fВы успешно поменяли префикс рангу &c%old_prefix% &f-> &c%prefix%"),
-    CLAN_RANK_PREFIX_CHANGE_LOCAL("clan.rank.prefix.change.local", "&7[&cКлан&7] &c%rank% &c%name% &fизменил префикс ранга &c%old_prefix &7- &c%prefix%"),
+    CLAN_RANK_PREFIX_CHANGE_LOCAL("clan.rank.prefix.change.local", "&7[&cКлан&7] &c%rank% &c%name% &fизменил префикс ранга &c%old_prefix% &7- &c%prefix%"),
     CLAN_QUESTS_UPDATED("clan.quests.updated", "&7[&cКлан&7] &fЕжедневные клановые задания обновлены!"),
     CLAN_QUESTS_COUNT_CHANGE("clan.quests.countChange", "&7[&cКлан&7] &fПрогресс одного из ежедневных квестов&c%count%&7/&c%max% &7(&c%percent%&7)"),
     CLAN_QUESTS_FINISHED("clan.quests.finished", "&7[&cКлан&7] &fВы успешно выполнили одно из своих заданий! За это вашему клану была начислена 1 монета!"),
@@ -131,7 +131,11 @@ public enum Messages implements MessagePath {
     TAKE_SUCCESS("clan.money.take.success", "&fВы успешно взяли из казны &c%amount%"),
     TAKE_SUCCESS_LOCAL("clan.money.take.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fвзял из казны &c%amount%"),
     ADD_SUCCESS("clan.money.add.success", "&fВы успешно положили в казну &c%amount%"),
-    ADD_SUCCESS_LOCAL("clan.money.add.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fположил в казну &c%amount%"),;
+    ADD_SUCCESS_LOCAL("clan.money.add.success.local", "&7[&cКлан&7] &c%rank% &c%name% &fположил в казну &c%amount%"),
+
+    CLAN_RANK_USAGE("clan.rank.usage", "&cИспользуй - /clan rank prefix [Индекс ранга] [Префикс]"),
+    CLAN_RANK_INDEX_NUMBER("clan.rank.indexNumber", "&cИндекс ранга должен был числом!"),
+    CLAN_RANK_NOT_EXISTS("clan.rank.notExists", "&cТакого ранга не существует!");
 
     private final String path, defaultValue;
 

@@ -8,8 +8,8 @@ import me.luckyzz.arbuzikclans.config.Messages;
 
 public class ConfirmKickClanMenu extends ConfirmClanMenu {
 
-    ConfirmKickClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService, ClanMember member, ClanMember whoKick) {
-        super(ClanMenuType.CONFIRM_KICK, messageConfig, menuText, menuService, inputMessageService, () -> member.getClan().getMembers().removeMember(member, whoKick), () -> {
+    ConfirmKickClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ClanMember member, ClanMember whoKick) {
+        super(ClanMenuType.CONFIRM_KICK, messageConfig, menuText, menuService, () -> member.getClan().getMembers().removeMember(member, whoKick), () -> {
         });
     }
 

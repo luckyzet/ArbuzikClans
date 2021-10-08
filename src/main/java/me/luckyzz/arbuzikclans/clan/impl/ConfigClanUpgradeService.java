@@ -5,10 +5,7 @@ import me.luckkyyz.luckapi.message.Message;
 import me.luckkyyz.luckapi.message.serialize.MessageSerializers;
 import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckkyyz.luckapi.util.itemstack.reader.ItemReaders;
-import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrade;
-import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgradeService;
-import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeRequirement;
-import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeType;
+import me.luckyzz.arbuzikclans.clan.upgrade.*;
 import me.luckyzz.arbuzikclans.config.ClanConfig;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -59,13 +56,18 @@ public class ConfigClanUpgradeService implements ClanUpgradeService {
 
             ClanUpgrade upgrade = null;
 
+            Set<UpgradeShowRequirement> showRequirements = new HashSet<>();
+            showRequirements.add(new AppliedUpgradeShowRequirement());
+
             UpgradeType type = UpgradeType.fromString(section.getString("type"));
             if(type == UpgradeType.MEMBER_SLOTS) {
+                showRequirements.add(new MemberUpgradeShowRequirement());
+
                 int amount = section.getInt("amount");
                 int level = section.getInt("level");
                 Message clanMessage = MessageSerializers.yaml().deserialize(section.getRoot(), section.getCurrentPath() + ".clanMessage");
 
-                upgrade = new ClanUpgradeImpl(executors, index, itemStack, type, new MemberUpgradeData(clanMessage, level, amount), requirements);
+                upgrade = new ClanUpgradeImpl(executors, index, itemStack, type, new MemberUpgradeData(clanMessage, level, amount), requirements, showRequirements);
                 upgrades.put(upgrade.getIndex(), upgrade);
 
             }
@@ -78,7 +80,7 @@ public class ConfigClanUpgradeService implements ClanUpgradeService {
                 int price = section.getInt("price");
                 Message clanMessage = MessageSerializers.yaml().deserialize(section.getRoot(), section.getCurrentPath() + ".clanMessage");
 
-                upgrade = new ClanUpgradeImpl(executors, index, itemStack, type, new ItemShopUpgradeData(clanMessage, itemStack2, price, dayOfWeeks), requirements);
+                upgrade = new ClanUpgradeImpl(executors, index, itemStack, type, new ItemShopUpgradeData(clanMessage, itemStack2, price, dayOfWeeks), requirements, showRequirements);
             }
 
             if(upgrade != null) {

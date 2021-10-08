@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 public class MemberClanMenu extends AbstractClanMenu {
 
-    MemberClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService) {
-        super(ClanMenuType.MEMBERS, messageConfig, menuText, menuService, inputMessageService);
+    MemberClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService) {
+        super(ClanMenuType.MEMBERS, messageConfig, menuText, menuService);
     }
 
     @Override

@@ -71,7 +71,20 @@ public enum MenuText implements MessagePath {
     UPGRADE_MENU_ITEM_NAME("upgradeMenu.item.name", "%name%"),
     UPGRADE_MENU_ITEM_LORE("upgradeMenu.item.lore", ""),
     UPGRADE_MENU_TITLE("upgradeMenu.title", "&fУлучшения"),
-    ;
+    MAIN_MENU_RANK_NAME("mainMenu.rank.name", "&7Ранги"),
+    MAIN_MENU_RANK_LORE("mainMenu.rank.lore", "\n&fСписок рангов"),
+    CHAT_MENU_TITLE("chatMenu.title", "&fЧат"),
+    CHAT_MENU_COMPASS_NAME("chatMenu.compass.name", "&7Состояние чата"),
+    CHAT_MENU_COMPASS_LORE("chatMenu.compass.lore", "\n&fВключен: &c%state%"),
+    CHAT_MENU_ENDER_PEARL_NAME("chatMenu.enderPearl.name", "&7Замученные игроки"),
+    CHAT_MENU_ENDER_PEARL_LORE("chatMenu.enderPearl.lore", "\n"),
+    CHAT_MENU_COMPASS_MANAGE_NAME("chatMenu.compass.manage.name", "&7Состояние чата"),
+    CHAT_MENU_COMPASS_MANAGE_LORE("chatMenu.compass.manage.lore", "\n&fВключен: &c%state%\n&fНажмите, чтобы изменить состояние"),
+    MAIN_MENU_CHAT_NAME("mainMenu.chat.name", "&7Чат"),
+    MAIN_MENU_CHAT_LORE("mainMenu.chat.lore", "\n&fИнформация о чате"),
+    SHOP_MENU_TITLE("shopMenu.title", "&fМагазин"),
+    MAIN_MENU_SHOP_NAME("mainMenu.shop.name", "&7Магазин"),
+    MAIN_MENU_SHOP_LORE("mainMenu.shop.lore", "\n&fПокупка предметов");
 
     private final String path, defaultValue;
 

@@ -28,8 +28,8 @@ import java.util.function.Function;
 
 public class BaseClanMenu extends AbstractClanMenu {
 
-    BaseClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService) {
-        super(ClanMenuType.BASE, messageConfig, menuText, menuService, inputMessageService);
+    BaseClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService) {
+        super(ClanMenuType.BASE, messageConfig, menuText, menuService);
     }
 
     @Override

@@ -6,9 +6,9 @@ import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.config.MenuText;
 import me.luckyzz.arbuzikclans.config.Messages;
 
-public class GiveRankClanMenu extends RankClanMenu {
+public class ShowRankClanMenu extends RankClanMenu {
 
-    GiveRankClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ClanMember target) {
-        super(ClanMenuType.RANK_GIVE, messageConfig, menuText, menuService, (target::changeRank));
+    ShowRankClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService) {
+        super(ClanMenuType.RANK_SHOW, messageConfig, menuText, menuService, true, (rank, member) -> {});
     }
 }

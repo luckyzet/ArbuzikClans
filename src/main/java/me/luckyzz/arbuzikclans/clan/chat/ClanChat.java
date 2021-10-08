@@ -9,6 +9,8 @@ public interface ClanChat {
 
     void send(String message, ClanMember member);
 
+    boolean isChatEnabled();
+
     void setChatEnabled(boolean can, ClanMember member);
 
 }

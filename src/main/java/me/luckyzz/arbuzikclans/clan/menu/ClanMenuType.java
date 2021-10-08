@@ -10,6 +10,9 @@ public enum ClanMenuType {
     CONFIRM_KICK,
     CONFIRM_DISBAND,
     QUESTS,
-    UPGRADE
+    UPGRADE,
+    RANK_SHOW,
+    CHAT,
+    SHOP
 
 }

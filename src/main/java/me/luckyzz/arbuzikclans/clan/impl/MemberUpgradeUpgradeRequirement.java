@@ -4,12 +4,21 @@ import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrade;
 import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeRequirement;
 
-class MemberUpgradeUpgradeRequirement implements UpgradeRequirement {
+public class MemberUpgradeUpgradeRequirement implements UpgradeRequirement {
 
     private final MemberUpgradeData upgradeData;
 
     MemberUpgradeUpgradeRequirement(MemberUpgradeData upgradeData) {
         this.upgradeData = upgradeData;
+    }
+
+    public MemberUpgradeData getUpgradeData() {
+        return upgradeData;
+    }
+
+    @Override
+    public RequirementType getType() {
+        return RequirementType.MEMBERS;
     }
 
     @Override

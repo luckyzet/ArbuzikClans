@@ -7,6 +7,7 @@ import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
 import me.luckyzz.arbuzikclans.clan.member.rank.NotUsedClanRank;
+import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.config.Messages;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -40,6 +41,11 @@ class ClanRankImpl extends NotUsedClanRankImpl implements ClanRank {
 
     @Override
     public void changePrefix(String prefix, ClanMember member) {
+        if(!member.hasPossibility(RankPossibility.RANK_RENAME)) {
+            member.apply(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
+            return;
+        }
+
         String old = getPrefix();
         setPrefix(ColorUtils.color(prefix));
         executors.async().update("UPDATE clanRanks SET prefix = ? WHERE clan = ? AND index = ?", this.getPrefix(), clan.getId(), getIndex());

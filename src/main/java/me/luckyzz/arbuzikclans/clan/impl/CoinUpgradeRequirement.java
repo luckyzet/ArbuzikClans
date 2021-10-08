@@ -5,12 +5,21 @@ import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeRequirement;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-class CoinUpgradeRequirement implements UpgradeRequirement {
+public class CoinUpgradeRequirement implements UpgradeRequirement {
 
     private final int coins;
 
     CoinUpgradeRequirement(int coins) {
         this.coins = coins;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    @Override
+    public RequirementType getType() {
+        return RequirementType.COINS;
     }
 
     @Override

@@ -11,6 +11,8 @@ import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.util.DurationUtil;
 
 import java.time.Duration;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 class ClanChatMutesImpl implements ClanChatMutes {
@@ -41,6 +43,11 @@ class ClanChatMutesImpl implements ClanChatMutes {
                 ((TimeClanChatMute) mute).setClan(clan);
             }
         });
+    }
+
+    @Override
+    public Collection<ClanChatMute> getMutes() {
+        return new HashSet<>(muteMap.values());
     }
 
     @Override

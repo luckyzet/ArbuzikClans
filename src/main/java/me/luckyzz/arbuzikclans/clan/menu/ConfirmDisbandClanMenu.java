@@ -8,8 +8,8 @@ import me.luckyzz.arbuzikclans.config.Messages;
 
 public class ConfirmDisbandClanMenu extends ConfirmClanMenu {
 
-    ConfirmDisbandClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService, ClanMember member) {
-        super(ClanMenuType.CONFIRM_DISBAND, messageConfig, menuText, menuService, inputMessageService, () -> member.getClan().disband(member), () -> {
+    ConfirmDisbandClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ClanMember member) {
+        super(ClanMenuType.CONFIRM_DISBAND, messageConfig, menuText, menuService, () -> member.getClan().disband(member), () -> {
         });
     }
 

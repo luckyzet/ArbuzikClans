@@ -20,8 +20,8 @@ public class ConfirmClanMenu extends AbstractClanMenu {
 
     private final Runnable action, actionIfFalse;
 
-    ConfirmClanMenu(ClanMenuType menuType, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService, Runnable action, Runnable actionIfFalse) {
-        super(menuType, messageConfig, menuText, menuService, inputMessageService);
+    ConfirmClanMenu(ClanMenuType menuType, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, Runnable action, Runnable actionIfFalse) {
+        super(menuType, messageConfig, menuText, menuService);
         this.action = action;
         this.actionIfFalse = actionIfFalse;
     }

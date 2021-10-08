@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 
 public class QuestClanMenu extends AbstractClanMenu {
 
-    QuestClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService) {
-        super(ClanMenuType.QUESTS, messageConfig, menuText, menuService, inputMessageService);
+    QuestClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService) {
+        super(ClanMenuType.QUESTS, messageConfig, menuText, menuService);
     }
 
     @Override

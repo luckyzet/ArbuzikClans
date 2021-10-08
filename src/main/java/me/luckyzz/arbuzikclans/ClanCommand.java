@@ -5,14 +5,17 @@ import me.luckkyyz.luckapi.command.ExecutingChecks;
 import me.luckkyyz.luckapi.command.ExecutingStrategy;
 import me.luckkyyz.luckapi.command.MessageExecutingActions;
 import me.luckkyyz.luckapi.config.MessageConfig;
+import me.luckkyyz.luckapi.util.color.ColorUtils;
 import me.luckkyyz.luckapi.util.player.PlayerFilters;
 import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.ClanService;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import me.luckyzz.arbuzikclans.clan.member.invite.ClanInvite;
 import me.luckyzz.arbuzikclans.clan.member.invite.ClanInviteService;
+import me.luckyzz.arbuzikclans.clan.member.rank.ClanRank;
 import me.luckyzz.arbuzikclans.clan.menu.ClanMenuService;
 import me.luckyzz.arbuzikclans.clan.menu.ClanMenuType;
+import me.luckyzz.arbuzikclans.clan.region.ClanRegion;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.util.DurationUtil;
 import me.luckyzz.arbuzikclans.util.Permissions;
@@ -240,8 +243,34 @@ final class ClanCommand {
                                 })
                         )
                 ).addSubCommand("rank", ExecutingStrategy.newBuilder()
-                        .commandStrategy()
+                        .subCommandStrategy()
+                        .addCheck(ExecutingChecks.argumentsLength(2, Integer.MAX_VALUE), actions.messageSend(Messages.CLAN_RANK_USAGE))
                         .addCheck(session -> clanService.hasClan(session.getExecutor().getPlayer()), actions.messageSend(Messages.NOT_CLAN))
+                        .addSubCommand("prefix", ExecutingStrategy.newBuilder()
+                                .commandStrategy()
+                                .addCheck(ExecutingChecks.argumentFormat(1, NumberUtils::isNumber), actions.messageSend(Messages.CLAN_RANK_INDEX_NUMBER))
+                                .addAction((executor, arguments) -> {
+                                    Player player = executor.getPlayer();
+                                    ClanMember member = clanService.getClanMemberPlayer(player);
+                                    Clan clan = member.getClan();
+
+                                    int rankIndex = Integer.parseInt(arguments.next());
+                                    StringBuilder prefixBuilder = new StringBuilder();
+
+                                    while (arguments.hasNext()) {
+                                        prefixBuilder.append(arguments.next()).append(" ");
+                                    }
+                                    String prefix = ColorUtils.color(prefixBuilder.toString().trim());
+
+                                    ClanRank rank = clan.getRanks().getRank(rankIndex);
+                                    if(rank == null) {
+                                        executor.send(messageConfig.getMessage(Messages.CLAN_RANK_NOT_EXISTS));
+                                        return;
+                                    }
+
+                                    rank.changePrefix(prefix, member);
+                                })
+                        )
                 )
         );
 

@@ -5,7 +5,6 @@ import me.luckkyyz.luckapi.chat.input.ChatInputMessageService;
 import me.luckkyyz.luckapi.chat.input.LuckChatInputMessageService;
 import me.luckkyyz.luckapi.config.MessageConfig;
 import me.luckkyyz.luckapi.database.*;
-import me.luckkyyz.luckapi.database.serialize.DatabaseSerializers;
 import me.luckkyyz.luckapi.menu.LuckMenuService;
 import me.luckkyyz.luckapi.menu.MenuService;
 import me.luckkyyz.luckapi.provider.economy.EconomyProvider;
@@ -83,7 +82,7 @@ public final class ArbuzikClansPlugin extends JavaPlugin {
         clanInviteService = new ClanInviteServiceImpl(this, clanService, config, messageConfig);
         clanRegionService = new ClanRegionServiceImpl(this, messageConfig, clanService);
 
-        clanMenuService = new ClanMenuServiceImpl(messageConfig, menuText, inputMessageService, clanUpgradeService);
+        clanMenuService = new ClanMenuServiceImpl(messageConfig, menuText, clanUpgradeService, economyProvider);
 
         new ClanCommand(messageConfig, clanService, clanMenuService, clanInviteService);
     }

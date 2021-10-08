@@ -2,10 +2,7 @@ package me.luckyzz.arbuzikclans.clan.impl;
 
 import me.luckkyyz.luckapi.database.QueryExecutors;
 import me.luckyzz.arbuzikclans.clan.Clan;
-import me.luckyzz.arbuzikclans.clan.upgrade.ClanUpgrade;
-import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeData;
-import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeRequirement;
-import me.luckyzz.arbuzikclans.clan.upgrade.UpgradeType;
+import me.luckyzz.arbuzikclans.clan.upgrade.*;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.inventory.ItemStack;
@@ -22,14 +19,16 @@ class ClanUpgradeImpl implements ClanUpgrade {
     private final UpgradeType upgradeType;
     private final UpgradeData upgradeData;
     private final Set<UpgradeRequirement> requirements;
+    private final Set<UpgradeShowRequirement> showRequirements;
 
-    ClanUpgradeImpl(QueryExecutors executors, int index, ItemStack itemStack, UpgradeType upgradeType, UpgradeData upgradeData, Set<UpgradeRequirement> requirements) {
+    ClanUpgradeImpl(QueryExecutors executors, int index, ItemStack itemStack, UpgradeType upgradeType, UpgradeData upgradeData, Set<UpgradeRequirement> requirements, Set<UpgradeShowRequirement> showRequirements) {
         this.executors = executors;
         this.index = index;
         this.itemStack = itemStack;
         this.upgradeType = upgradeType;
         this.upgradeData = upgradeData;
         this.requirements = requirements;
+        this.showRequirements = showRequirements;
 
         if (upgradeType == UpgradeType.MEMBER_SLOTS) {
             this.requirements.add(new MemberUpgradeUpgradeRequirement((MemberUpgradeData) upgradeData));
@@ -60,6 +59,11 @@ class ClanUpgradeImpl implements ClanUpgrade {
     @Override
     public Collection<UpgradeRequirement> getRequirements() {
         return requirements;
+    }
+
+    @Override
+    public Collection<UpgradeShowRequirement> getShowRequirements() {
+        return showRequirements;
     }
 
     @Override

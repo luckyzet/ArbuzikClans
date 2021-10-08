@@ -8,6 +8,7 @@ import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.chat.ClanChat;
 import me.luckyzz.arbuzikclans.clan.chat.mute.ClanChatMute;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
+import me.luckyzz.arbuzikclans.clan.member.rank.RankPossibility;
 import me.luckyzz.arbuzikclans.config.Messages;
 import me.luckyzz.arbuzikclans.util.DurationUtil;
 import org.bukkit.entity.Player;
@@ -36,6 +37,11 @@ class ClanChatImpl implements ClanChat {
 
     void setClan(Clan clan) {
         this.clan = clan;
+    }
+
+    @Override
+    public boolean isChatEnabled() {
+        return chatEnabled;
     }
 
     @Override
@@ -70,6 +76,11 @@ class ClanChatImpl implements ClanChat {
 
     @Override
     public void setChatEnabled(boolean can, ClanMember member) {
+        if(!member.hasPossibility(RankPossibility.CHAT_ENABLE)) {
+            member.apply(player -> messageConfig.getMessage(Messages.NOT_ACCESS).send(player));
+            return;
+        }
+
         if (can == chatEnabled) {
             member.apply(player -> messageConfig.getMessage(Messages.SUCCESS_BUT_ALREADY).send(player));
             return;

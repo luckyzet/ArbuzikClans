@@ -26,10 +26,19 @@ import java.util.function.BiFunction;
 public class RankClanMenu extends AbstractClanMenu {
 
     private final BiConsumer<ClanRank, ClanMember> actionClick;
+    private final boolean backButton;
 
-    RankClanMenu(ClanMenuType type, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService,
+    RankClanMenu(ClanMenuType type, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService,
                  BiConsumer<ClanRank, ClanMember> actionClick) {
-        super(type, messageConfig, menuText, menuService, inputMessageService);
+        super(type, messageConfig, menuText, menuService);
+        this.backButton = false;
+        this.actionClick = actionClick;
+    }
+
+    RankClanMenu(ClanMenuType type, MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService,
+                 boolean backButton, BiConsumer<ClanRank, ClanMember> actionClick) {
+        super(type, messageConfig, menuText, menuService);
+        this.backButton = backButton;
         this.actionClick = actionClick;
     }
 
@@ -41,7 +50,7 @@ public class RankClanMenu extends AbstractClanMenu {
                 .placeholder("%prefix%", rank.getPrefix())
                 .toRawText();
 
-        PatternFillingStrategy<MenuSession> patternFillingStrategy = new PatternFillingStrategy<>().setPattern("---------", "-ABCDEFI-", "---------")
+        PatternFillingStrategy<MenuSession> patternFillingStrategy = new PatternFillingStrategy<>().setPattern("P--------", "-ABCDEFI-", "---------")
                 .withButton('A', new MenuButton(ItemBuilders.newBuilder()
                         .setType(Material.COAL)
                         .setDisplay(placeholders.apply(clan.getRanks().getRank(1), menuText.getMessage(MenuText.RANK_MENU_COAL_NAME)))
@@ -120,6 +129,19 @@ public class RankClanMenu extends AbstractClanMenu {
                         player.closeInventory();
                     }
                 }));
+
+        if(backButton) {
+            patternFillingStrategy.withButton('P', new MenuButton(ItemBuilders.newBuilder()
+                    .setType(Material.CLAY_BALL)
+                    .setDisplay(menuText.getMessage(MenuText.BACK_BUTTON_NAME).toRawText())
+                    .setLore(Arrays.asList(menuText.getMessage(MenuText.BACK_BUTTON_LORE).toRawText().split("\n")))
+                    .create(), new ClickCallback() {
+                @Override
+                public void processClick(Player player, ClickType ignored1, int ignored2) {
+                    menuService.getMenu(ClanMenuType.MAIN).openMenu(member);
+                }
+            }));
+        }
 
         member.apply(player -> PreparedMenu.newBuilder()
                 .setTitleGenerator(session -> menuText.getMessage(menuType == ClanMenuType.RANK_GIVE ? MenuText.RANK_MENU_GIVE_TITLE : MenuText.RANK_MENU_CHANGE_TITLE).toRawText())

@@ -20,6 +20,8 @@ public enum RankPossibility {
     DISBAND,
     MONEY_TAKE,
     MONEY_ADD,
-    VICE
+    VICE,
+    RANK_RENAME,
+    CHAT_ENABLE
 
 }

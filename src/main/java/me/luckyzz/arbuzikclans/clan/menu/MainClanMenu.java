@@ -25,8 +25,8 @@ import java.util.function.Function;
 
 public class MainClanMenu extends AbstractClanMenu {
 
-    MainClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService, ChatInputMessageService inputMessageService) {
-        super(ClanMenuType.MAIN, messageConfig, menuText, menuService, inputMessageService);
+    MainClanMenu(MessageConfig<Messages> messageConfig, MessageConfig<MenuText> menuText, ClanMenuService menuService) {
+        super(ClanMenuType.MAIN, messageConfig, menuText, menuService);
     }
 
     @Override
@@ -89,6 +89,33 @@ public class MainClanMenu extends AbstractClanMenu {
                     @Override
                     public void processClick(Player player, ClickType ignored2, int ignored3) {
                         menuService.getMenu(ClanMenuType.UPGRADE).openMenu(member);
+                    }
+                })).withButton('F', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.BOW)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_RANK_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_RANK_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.RANK_SHOW).openMenu(member);
+                    }
+                })).withButton('G', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.PAPER)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_CHAT_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_CHAT_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.CHAT).openMenu(member);
+                    }
+                })).withButton('J', new MenuButton(ItemBuilders.newBuilder()
+                        .setType(Material.EMERALD)
+                        .setDisplay(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_SHOP_NAME)))
+                        .setLore(Arrays.asList(placeholders.apply(menuText.getMessage(MenuText.MAIN_MENU_SHOP_LORE)).split("\n")))
+                        .create(), new ClickCallback() {
+                    @Override
+                    public void processClick(Player player, ClickType ignored2, int ignored3) {
+                        menuService.getMenu(ClanMenuType.SHOP).openMenu(member);
                     }
                 }));
 

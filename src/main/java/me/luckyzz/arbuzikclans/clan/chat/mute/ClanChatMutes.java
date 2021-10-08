@@ -4,9 +4,14 @@ import me.luckyzz.arbuzikclans.clan.Clan;
 import me.luckyzz.arbuzikclans.clan.member.ClanMember;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public interface ClanChatMutes {
 
     Clan getClan();
+
+    Collection<ClanChatMute> getMutes();
 
     ClanChatMute getMute(ClanMember member);
 
